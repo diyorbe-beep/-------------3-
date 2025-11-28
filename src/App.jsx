@@ -1,15 +1,23 @@
 import { useState, useEffect } from 'react'
 import './App.css'
+import Survey from './Survey.jsx'
 
-function App() {
+function LandingPage({ onNavigate }) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [openFaq, setOpenFaq] = useState(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
+    email: '',
     phone: '',
     product: '',
     comment: ''
+  })
+  const [showSignUp, setShowSignUp] = useState(false)
+  const [signUpData, setSignUpData] = useState({
+    name: '',
+    email: '',
+    password: ''
   })
 
   useEffect(() => {
@@ -38,7 +46,28 @@ function App() {
     e.preventDefault()
     console.log('Form submitted:', formData)
     alert('Buyurtmangiz qabul qilindi! Tez orada siz bilan bog\'lanamiz.')
-    setFormData({ name: '', phone: '', product: '', comment: '' })
+    setFormData({ name: '', email: '', phone: '', product: '', comment: '' })
+  }
+
+  const handleSignUp = (e) => {
+    e.preventDefault()
+    // Gmail formatini tekshirish
+    const emailRegex = /^[^\s@]+@gmail\.com$/i
+    if (!emailRegex.test(signUpData.email)) {
+      alert('Iltimos, to\'g\'ri Gmail manzilini kiriting (masalan: example@gmail.com)')
+      return
+    }
+    console.log('Sign up:', signUpData)
+    alert('Ro\'yxatdan o\'tdingiz! Email manzilingizga tasdiqlash xabari yuborildi.')
+    setSignUpData({ name: '', email: '', password: '' })
+    setShowSignUp(false)
+  }
+
+  const handleGoogleSignIn = () => {
+    // Google OAuth demo - haqiqiy loyihada Google OAuth API dan foydalanish kerak
+    alert('Google orqali ro\'yxatdan o\'tish. Haqiqiy loyihada Google OAuth API ulanadi.')
+    // Bu yerda Google OAuth popup ochiladi
+    // window.open('https://accounts.google.com/...', 'google-auth', 'width=500,height=600')
   }
 
   const toggleFaq = (index) => {
@@ -78,12 +107,12 @@ function App() {
               </button>
             </nav>
             <div className="flex items-center gap-4">
-              <button
-                onClick={() => scrollToSection('how-it-works')}
-                className="hidden md:block bg-[#111111] text-white px-4 py-2 rounded-md text-sm hover:bg-gold transition-colors"
-              >
-                Surovnoma boshlash
-              </button>
+            <button
+              onClick={() => onNavigate('survey')}
+              className="hidden md:block bg-[#111111] text-white px-4 py-2 rounded-md text-sm hover:bg-gold transition-colors"
+            >
+              Surovnoma boshlash
+            </button>
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="md:hidden text-[#111111] p-2"
@@ -122,7 +151,7 @@ function App() {
                   Bog'lanish
                 </button>
                 <button
-                  onClick={() => scrollToSection('how-it-works')}
+                  onClick={() => onNavigate('survey')}
                   className="bg-[#111111] text-white px-4 py-2 rounded-md text-sm hover:bg-gold transition-colors mt-2"
                 >
                   Surovnoma boshlash
@@ -160,7 +189,7 @@ function App() {
               </ul>
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <button
-                  onClick={() => scrollToSection('how-it-works')}
+                  onClick={() => onNavigate('survey')}
                   className="bg-[#111111] text-white px-8 py-3 rounded-md hover:bg-gold transition-colors font-medium"
                 >
                   Surovnoma boshlash
@@ -221,7 +250,7 @@ function App() {
           </div>
           <div className="text-center mt-12">
             <button
-              onClick={() => scrollToSection('how-it-works')}
+              onClick={() => onNavigate('survey')}
               className="bg-[#111111] text-white px-8 py-3 rounded-md hover:bg-gold transition-colors font-medium"
             >
               Surovnoma boshlash
@@ -451,6 +480,88 @@ function App() {
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-[#111111]">
             Buyurtma qoldiring
           </h2>
+          
+          {/* Gmail orqali ro'yxatdan o'tish bo'limi */}
+          <div className="mb-12 text-center">
+            <div className="bg-cream p-6 rounded-lg max-w-md mx-auto">
+              <h3 className="text-xl font-semibold mb-4 text-[#111111]">Gmail orqali ro'yxatdan o'ting</h3>
+              {!showSignUp ? (
+                <button
+                  onClick={() => setShowSignUp(true)}
+                  className="w-full bg-white border-2 border-[#111111] text-[#111111] px-6 py-3 rounded-md hover:bg-[#111111] hover:text-white transition-colors font-medium mb-3 flex items-center justify-center gap-2"
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                  </svg>
+                  Gmail orqali ro'yxatdan o'tish
+                </button>
+              ) : (
+                <form onSubmit={handleSignUp} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-[#111111]">
+                      Ismingiz
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={signUpData.name}
+                      onChange={(e) => setSignUpData({ ...signUpData, name: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
+                      placeholder="Ismingizni kiriting"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-[#111111]">
+                      Gmail manzilingiz
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={signUpData.email}
+                      onChange={(e) => setSignUpData({ ...signUpData, email: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
+                      placeholder="example@gmail.com"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-[#111111]">
+                      Parol
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      value={signUpData.password}
+                      onChange={(e) => setSignUpData({ ...signUpData, password: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
+                      placeholder="Parol yarating"
+                    />
+                  </div>
+                  <div className="flex gap-3">
+                    <button
+                      type="submit"
+                      className="flex-1 bg-[#111111] text-white px-4 py-2 rounded-md hover:bg-gold transition-colors font-medium"
+                    >
+                      Ro'yxatdan o'tish
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowSignUp(false)
+                        setSignUpData({ name: '', email: '', password: '' })
+                      }}
+                      className="flex-1 bg-gray-200 text-[#111111] px-4 py-2 rounded-md hover:bg-gray-300 transition-colors font-medium"
+                    >
+                      Bekor qilish
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
+
           <div className="grid md:grid-cols-2 gap-12">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
@@ -464,6 +575,18 @@ function App() {
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
                   placeholder="Ismingizni kiriting"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-[#111111]">
+                  Email manzilingiz (ixtiyoriy)
+                </label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
+                  placeholder="email@example.com"
                 />
               </div>
               <div>
@@ -561,6 +684,16 @@ function App() {
       </footer>
     </div>
   )
+}
+
+function App() {
+  const [currentPage, setCurrentPage] = useState('home')
+
+  if (currentPage === 'survey') {
+    return <Survey onNavigate={() => setCurrentPage('home')} />
+  }
+
+  return <LandingPage onNavigate={setCurrentPage} />
 }
 
 export default App
