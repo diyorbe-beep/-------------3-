@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import Survey from './Survey.jsx'
-import probnik from './assets/image.png'
 
 function LandingPage({ onNavigate }) {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -294,9 +293,8 @@ function LandingPage({ onNavigate }) {
             <div className="bg-white p-8 rounded-lg shadow-lg">
               <div className="aspect-square bg-cream rounded-lg flex items-center justify-center mb-6">
                 <div className="text-center">
-                  <p className="text-sm text-gray-600">
-                    <img src={probnik} alt="Probnik" className="w-full h-full object-cover" />
-                  </p>
+                  <div className="w-24 h-32 bg-gold/20 rounded mx-auto mb-4"></div>
+                  <p className="text-sm text-gray-600">Flakon rasmi</p>
                 </div>
               </div>
               <button
