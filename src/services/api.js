@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:3001/api'
+const API_BASE_URL = 'https://atir.onrender.com/api'
 
 // Helper function for API calls
 const apiCall = async (endpoint, options = {}) => {

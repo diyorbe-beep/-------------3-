@@ -15,32 +15,14 @@ Zamonaviy landing page va admin panel bilan to'liq funksional parfum brendi veb-
 npm install
 ```
 
-### 2. Backend paketlarini o'rnatish:
-```bash
-cd backend
-npm install
-cd ..
-```
+### 2. Ishga tushirish:
 
-### 3. Ishga tushirish:
-
-**Variant 1: Alohida terminalda**
-
-Backend serverni ishga tushirish:
-```bash
-cd backend
-npm start
-```
-
-Yangi terminalda frontend serverni ishga tushirish:
+Frontend serverni ishga tushirish:
 ```bash
 npm run dev
 ```
 
-**Variant 2: Bir vaqtda (ikkalasini birga)**
-```bash
-npm run dev:all
-```
+**Eslatma**: Backend allaqachon production da ishlayapti (`https://atir.onrender.com`). Local backend kerak emas.
 
 ## Struktura
 
@@ -49,11 +31,7 @@ npm run dev:all
 │   ├── components/         # React komponentlar
 │   ├── pages/             # Sahifalar
 │   │   └── admin/          # Admin panel sahifalari
-│   └── services/           # API servislar
-├── backend/                # Backend kodlar
-│   ├── server.js           # Express server
-│   ├── package.json        # Backend dependencies
-│   └── data.json           # Ma'lumotlar bazasi (avtomatik yaratiladi)
+│   └── services/           # API servislar (https://atir.onrender.com/api ga ulangan)
 └── package.json            # Frontend dependencies
 ```
 
@@ -99,23 +77,24 @@ npm run dev:all
 
 ## Ishlatish
 
-1. Backend server `http://localhost:3001` da ishlaydi
-2. Frontend `http://localhost:5173` da ishlaydi
-3. Admin panelga kirish (maxfiy usullar):
+1. **Backend server** production da ishlaydi: `https://atir.onrender.com`
+2. **Frontend** `http://localhost:5173` da ishlaydi (development)
+3. **Admin panelga kirish** (maxfiy usullar):
    - **Variant 1**: URL parametr orqali - `http://localhost:5173?admin=true` yoki `?admin=1`
    - **Variant 2**: Hash orqali - `http://localhost:5173#admin`
    - **Variant 3**: HIDIM logotipiga 5 marta ketma-ket bosish (header da)
 
 ## Eslatma
 
-Barcha ma'lumotlar `backend/data.json` faylida saqlanadi. Bu fayl avtomatik yaratiladi va yangilanadi.
+- Backend production serverni Render.com da deploy qilingan
+- Barcha API so'rovlar `https://atir.onrender.com/api` ga yuboriladi
+- Ma'lumotlar production serverni ma'lumotlar bazasida saqlanadi
 
 ## Qo'shimcha ma'lumot
 
-- Backend alohida `backend/` papkasida joylashgan
-- Backend o'z `package.json` va `node_modules` ga ega
+- Backend production da: `https://atir.onrender.com`
+- API URL: `https://atir.onrender.com/api`
 - Frontend va backend mustaqil ishlaydi
-- API URL: `http://localhost:3001/api`
 
 ## Google OAuth 2.0 Sozlash
 

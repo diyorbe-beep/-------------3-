@@ -83,14 +83,16 @@ VITE_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
 
 ### 📊 API Endpoints:
 
-- `GET/POST /api/orders` - Buyurtmalar
-- `GET/POST /api/customers` - Mijozlar
-- `GET/POST /api/profiles` - Hid profillari
-- `GET/POST /api/discounts` - Chegirmalar
-- `GET/POST /api/feedback` - Feedbacklar
-- `GET/POST /api/surveys` - Surovnomalar
-- `GET/PUT /api/settings` - Sozlamalar
-- `GET /api/dashboard/stats` - Statistika
+Backend production serverni: `https://atir.onrender.com`
+
+- `GET/POST https://atir.onrender.com/api/orders` - Buyurtmalar
+- `GET/POST https://atir.onrender.com/api/customers` - Mijozlar
+- `GET/POST https://atir.onrender.com/api/profiles` - Hid profillari
+- `GET/POST https://atir.onrender.com/api/discounts` - Chegirmalar
+- `GET/POST https://atir.onrender.com/api/feedback` - Feedbacklar
+- `GET/POST https://atir.onrender.com/api/surveys` - Surovnomalar
+- `GET/PUT https://atir.onrender.com/api/settings` - Sozlamalar
+- `GET https://atir.onrender.com/api/dashboard/stats` - Statistika
 
 ### ✨ Asosiy xususiyatlar:
 
@@ -104,10 +106,11 @@ VITE_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
 
 ### 📝 Eslatmalar:
 
-1. **Backend server** `http://localhost:3001` da ishlaydi
-2. **Frontend** `http://localhost:5173` da ishlaydi
-3. **Ma'lumotlar** `backend/data.json` da saqlanadi
+1. **Backend server** production da ishlaydi: `https://atir.onrender.com`
+2. **Frontend** `http://localhost:5173` da ishlaydi (development)
+3. **Ma'lumotlar** production serverni ma'lumotlar bazasida saqlanadi
 4. **Google OAuth** paket o'rnatilmagan bo'lsa ham ishlaydi (conditional)
+5. **API URL** avtomatik `https://atir.onrender.com/api` ga so'rovlar yuboradi
 
 ### 🎯 Keyingi qadamlar (ixtiyoriy):
 
