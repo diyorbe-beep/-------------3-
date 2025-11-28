@@ -1,31 +1,81 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { discountsAPI } from '../../services/api'
 
 function DiscountsPage() {
-  const [promoCodes, setPromoCodes] = useState([
-    { code: "VIDEO10", discount: 10, description: "Video fikr uchun", active: true },
-    { code: "FIRST10", discount: 10, description: "Birinchi buyurtma uchun", active: true },
-    { code: "WINTER15", discount: 15, description: "Qish mavsumi uchun", active: false },
-    { code: "VIP20", discount: 20, description: "VIP mijozlar uchun", active: true },
-  ])
-
+  const [promoCodes, setPromoCodes] = useState([])
   const [showForm, setShowForm] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [formData, setFormData] = useState({
     code: '',
     discount: '',
     description: ''
   })
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    setPromoCodes([...promoCodes, { ...formData, discount: parseInt(formData.discount), active: true }])
-    setFormData({ code: '', discount: '', description: '' })
-    setShowForm(false)
+  useEffect(() => {
+    loadDiscounts()
+  }, [])
+
+  const loadDiscounts = async () => {
+    try {
+      setLoading(true)
+      const data = await discountsAPI.getAll()
+      setPromoCodes(data)
+    } catch (error) {
+      console.error('Error loading discounts:', error)
+      alert('Chegirmalarni yuklashda xatolik yuz berdi')
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const toggleActive = (code) => {
-    setPromoCodes(promoCodes.map(promo => 
-      promo.code === code ? { ...promo, active: !promo.active } : promo
-    ))
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    try {
+      const newDiscount = await discountsAPI.create({
+        ...formData,
+        discount: parseInt(formData.discount),
+        active: true
+      })
+      setPromoCodes([...promoCodes, newDiscount])
+      setFormData({ code: '', discount: '', description: '' })
+      setShowForm(false)
+      alert('Promo kod muvaffaqiyatli qo\'shildi!')
+    } catch (error) {
+      console.error('Error creating discount:', error)
+      alert('Promo kod qo\'shishda xatolik yuz berdi')
+    }
+  }
+
+  const toggleActive = async (id) => {
+    try {
+      const discount = promoCodes.find(d => d.id === id)
+      const updated = await discountsAPI.update(id, { active: !discount.active })
+      setPromoCodes(promoCodes.map(d => d.id === id ? updated : d))
+    } catch (error) {
+      console.error('Error updating discount:', error)
+      alert('Holatni yangilashda xatolik yuz berdi')
+    }
+  }
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Bu promo kodni o\'chirishni xohlaysizmi?')) {
+      try {
+        await discountsAPI.delete(id)
+        setPromoCodes(promoCodes.filter(d => d.id != id))
+        alert('Promo kod o\'chirildi!')
+      } catch (error) {
+        console.error('Error deleting discount:', error)
+        alert('Promo kodni o\'chirishda xatolik yuz berdi')
+      }
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-gray-600">Yuklanmoqda...</p>
+      </div>
+    )
   }
 
   return (
@@ -104,28 +154,42 @@ function DiscountsPage() {
               </tr>
             </thead>
             <tbody>
-              {promoCodes.map((promo, index) => (
-                <tr key={index} className="border-b border-gray-100 hover:bg-cream/50">
-                  <td className="py-3 px-4 text-sm text-gray-700 font-mono font-semibold">{promo.code}</td>
-                  <td className="py-3 px-4 text-sm text-gray-700">{promo.discount}%</td>
-                  <td className="py-3 px-4 text-sm text-gray-700">{promo.description}</td>
-                  <td className="py-3 px-4">
-                    <span className={`inline-block px-2 py-1 text-xs rounded-full ${
-                      promo.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                    }`}>
-                      {promo.active ? 'Aktiv' : 'Noaktiv'}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4">
-                    <button
-                      onClick={() => toggleActive(promo.code)}
-                      className="text-gold hover:text-brown text-sm font-medium"
-                    >
-                      {promo.active ? 'Noaktiv qilish' : 'Aktiv qilish'}
-                    </button>
-                  </td>
+              {promoCodes.length > 0 ? (
+                promoCodes.map((promo) => (
+                  <tr key={promo.id} className="border-b border-gray-100 hover:bg-cream/50">
+                    <td className="py-3 px-4 text-sm text-gray-700 font-mono font-semibold">{promo.code}</td>
+                    <td className="py-3 px-4 text-sm text-gray-700">{promo.discount}%</td>
+                    <td className="py-3 px-4 text-sm text-gray-700">{promo.description}</td>
+                    <td className="py-3 px-4">
+                      <span className={`inline-block px-2 py-1 text-xs rounded-full ${
+                        promo.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+                      }`}>
+                        {promo.active ? 'Aktiv' : 'Noaktiv'}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => toggleActive(promo.id)}
+                          className="text-gold hover:text-brown text-sm font-medium"
+                        >
+                          {promo.active ? 'Noaktiv qilish' : 'Aktiv qilish'}
+                        </button>
+                        <button
+                          onClick={() => handleDelete(promo.id)}
+                          className="text-red-500 hover:text-red-700 text-sm font-medium"
+                        >
+                          O'chirish
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="py-4 text-center text-gray-500">Promo kodlar topilmadi</td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
@@ -135,4 +199,3 @@ function DiscountsPage() {
 }
 
 export default DiscountsPage
-

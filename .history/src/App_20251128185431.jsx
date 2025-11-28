@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { ordersAPI, customersAPI } from './services/api'
+import { ordersAPI } from './services/api'
 import './App.css'
 import Survey from './Survey.jsx'
 import AdminPanel from './pages/admin/AdminPanel.jsx'
@@ -9,7 +9,6 @@ function LandingPage({ onNavigate }) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [openFaq, setOpenFaq] = useState(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [logoClickCount, setLogoClickCount] = useState(0)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -23,7 +22,6 @@ function LandingPage({ onNavigate }) {
     email: '',
     password: ''
   })
-  const [googleOAuthModule, setGoogleOAuthModule] = useState(null)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,87 +31,25 @@ function LandingPage({ onNavigate }) {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // URL parametr orqali admin panelga kirish
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search)
-    if (urlParams.get('admin') === 'true' || urlParams.get('admin') === '1') {
-      onNavigate('admin')
-    }
-  }, [onNavigate])
-
-  // Logotipga 5 marta bosish orqali admin panelga kirish
-  const handleLogoClick = () => {
-    const newCount = logoClickCount + 1
-    setLogoClickCount(newCount)
-    
-    if (newCount >= 5) {
-      setLogoClickCount(0)
-      onNavigate('admin')
-    } else {
-      // 3 soniyadan keyin reset qilish
-      setTimeout(() => {
-        setLogoClickCount(0)
-      }, 3000)
-    }
-  }
-
-  // Google OAuth modulini yuklash
-  useEffect(() => {
-    import('@react-oauth/google')
-      .then((module) => {
-        setGoogleOAuthModule(module)
-      })
-      .catch((error) => {
-        console.warn('⚠️ @react-oauth/google paketi o\'rnatilmagan. Google OAuth ishlamaydi.')
-        console.warn('O\'rnatish uchun: npm install @react-oauth/google')
-      })
-  }, [])
-
-  // Google OAuth login funksiyasi
-  const handleGoogleLogin = () => {
-    if (!googleOAuthModule) {
-      alert('Google OAuth hali yuklanmagan yoki paket o\'rnatilmagan. Iltimos, npm install @react-oauth/google ni bajaring.')
-      return
-    }
-
-    const { useGoogleLogin } = googleOAuthModule
-    // Bu yerda hook ni ishlatib bo'lmaydi, shuning uchun boshqa yondashuv
-    alert('Google OAuth integratsiyasi ishlayapti. Paket o\'rnatilgan bo\'lsa, Google Sign-In popup ochiladi.')
-  }
-
-  const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId)
+  const scrollToSection = (id) => {
+    const element = document.getElementById(id)
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' })
+      const headerOffset = 80
+      const elementPosition = element.getBoundingClientRect().top
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      })
       setMobileMenuOpen(false)
     }
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
-    try {
-      const productMap = {
-        '10ml': '10 ml Probnik',
-        '50ml': '50 ml EDP',
-        '100ml': '100 ml EDP'
-      }
-      
-      await ordersAPI.create({
-        customer: formData.name,
-        phone: formData.phone,
-        email: formData.email,
-        product: productMap[formData.product] || formData.product,
-        price: formData.product === '10ml' ? '45 000' : formData.product === '50ml' ? '299 000' : '499 000',
-        comment: formData.comment,
-        status: 'Yangi'
-      })
-      
-      alert('Buyurtmangiz qabul qilindi! Tez orada siz bilan bog\'lanamiz.')
-      setFormData({ name: '', email: '', phone: '', product: '', comment: '' })
-    } catch (error) {
-      console.error('Error submitting order:', error)
-      alert('Buyurtma yuborishda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.')
-    }
+    console.log('Form submitted:', formData)
+    alert('Buyurtmangiz qabul qilindi! Tez orada siz bilan bog\'lanamiz.')
+    setFormData({ name: '', email: '', phone: '', product: '', comment: '' })
   }
 
   const handleSignUp = (e) => {
@@ -130,6 +66,13 @@ function LandingPage({ onNavigate }) {
     setShowSignUp(false)
   }
 
+  const handleGoogleSignIn = () => {
+    // Google OAuth demo - haqiqiy loyihada Google OAuth API dan foydalanish kerak
+    alert('Google orqali ro\'yxatdan o\'tish. Haqiqiy loyihada Google OAuth API ulanadi.')
+    // Bu yerda Google OAuth popup ochiladi
+    // window.open('https://accounts.google.com/...', 'google-auth', 'width=500,height=600')
+  }
+
   const toggleFaq = (index) => {
     setOpenFaq(openFaq === index ? null : index)
   }
@@ -142,14 +85,10 @@ function LandingPage({ onNavigate }) {
       }`}>
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <button
-              onClick={handleLogoClick}
-              className="flex flex-col hover:opacity-80 transition-opacity cursor-pointer"
-              title={logoClickCount > 0 ? `${5 - logoClickCount} marta qoldi` : ''}
-            >
+            <div className="flex flex-col">
               <h1 className="text-2xl font-bold text-[#111111]">HIDIM</h1>
               <p className="text-xs text-gray-600">Shaxsiy parfum brendi</p>
-            </button>
+            </div>
             <nav className="hidden md:flex items-center gap-6">
               <button onClick={() => scrollToSection('hero')} className="text-sm hover:text-gold transition-colors">
                 Asosiy
@@ -171,12 +110,12 @@ function LandingPage({ onNavigate }) {
               </button>
             </nav>
             <div className="flex items-center gap-4">
-              <button
-                onClick={() => onNavigate('survey')}
-                className="hidden md:block bg-[#111111] text-white px-4 py-2 rounded-md text-sm hover:bg-gold transition-colors"
-              >
-                Surovnoma boshlash
-              </button>
+            <button
+              onClick={() => onNavigate('survey')}
+              className="hidden md:block bg-[#111111] text-white px-4 py-2 rounded-md text-sm hover:bg-gold transition-colors"
+            >
+              Surovnoma boshlash
+            </button>
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="md:hidden text-[#111111] p-2"
@@ -230,25 +169,28 @@ function LandingPage({ onNavigate }) {
       <section id="hero" className="pt-24 pb-16 px-4 bg-gradient-to-b from-white to-cream">
         <div className="container mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="text-center md:text-left">
-              <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4 text-[#111111]">
+            <div className="space-y-6">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#111111] leading-tight">
                 HIDIM — Sizga mos shaxsiy hid
               </h1>
-              <p className="text-lg md:text-xl text-gray-700 mb-6">
+              <p className="text-xl md:text-2xl text-gray-700">
                 Hid sizniki. Xarakter sizniki. Atir bizdan.
               </p>
-              <ul className="text-gray-700 space-y-2 mb-8 text-left inline-block md:block">
+              <ul className="space-y-3 text-gray-600">
                 <li className="flex items-center gap-2">
-                  <span className="text-gold">✓</span> 30 soniyalik surovnoma
+                  <span className="w-2 h-2 bg-gold rounded-full"></span>
+                  30 soniyalik surovnoma
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-gold">✓</span> 10 ml probnik — 45 000 so'm
+                  <span className="w-2 h-2 bg-gold rounded-full"></span>
+                  10 ml probnik — 45 000 so'm
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-gold">✓</span> Yoqsa — 50/100 ml shaxsiy atir
+                  <span className="w-2 h-2 bg-gold rounded-full"></span>
+                  Yoqsa — 50/100 ml shaxsiy atir
                 </li>
               </ul>
-              <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center md:justify-start">
+              <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <button
                   onClick={() => onNavigate('survey')}
                   className="bg-[#111111] text-white px-8 py-3 rounded-md hover:bg-gold transition-colors font-medium"
@@ -257,25 +199,24 @@ function LandingPage({ onNavigate }) {
                 </button>
                 <button
                   onClick={() => scrollToSection('sample')}
-                  className="border border-[#111111] text-[#111111] px-8 py-3 rounded-md hover:bg-cream transition-colors font-medium"
+                  className="border-2 border-[#111111] text-[#111111] px-8 py-3 rounded-md hover:bg-[#111111] hover:text-white transition-colors font-medium"
                 >
                   Probnik buyurtma qilish
                 </button>
               </div>
             </div>
-            <div className="bg-cream p-8 rounded-lg shadow-lg text-center">
-              <div className="w-48 h-64 bg-gold/20 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                <img src={probnik} alt="HIDIM 10 ml PROBNIK" className="max-w-full max-h-full object-contain" />
+            <div className="bg-cream p-8 rounded-lg shadow-lg">
+              <div className="space-y-4">
+                <h3 className="text-2xl font-bold text-[#111111]">HIDIM 10 ml PROBNIK</h3>
+                <p className="text-gray-700">Sizga mos hidni avval sinab ko'ring.</p>
+                <p className="text-3xl font-bold text-gold">45 000 so'm</p>
+                <button
+                  onClick={() => scrollToSection('sample')}
+                  className="bg-[#111111] text-white px-6 py-2 rounded-md hover:bg-gold transition-colors"
+                >
+                  Batafsil
+                </button>
               </div>
-              <h3 className="text-xl font-bold text-[#111111] mb-2">HIDIM 10 ml PROBNIK</h3>
-              <p className="text-gray-700 mb-4">Sizga mos hidni avval sinab ko'ring.</p>
-              <p className="text-2xl font-bold text-gold mb-4">45 000 so'm</p>
-              <button
-                onClick={() => scrollToSection('sample')}
-                className="bg-[#111111] text-white px-6 py-2 rounded-md text-sm hover:bg-gold transition-colors"
-              >
-                Batafsil
-              </button>
             </div>
           </div>
         </div>
@@ -283,25 +224,28 @@ function LandingPage({ onNavigate }) {
 
       {/* How It Works Section */}
       <section id="how-it-works" className="py-20 px-4 bg-white">
-        <div className="container mx-auto max-w-4xl">
+        <div className="container mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-[#111111]">
             HIDIM qanday ishlaydi?
           </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-cream p-6 rounded-lg shadow-sm text-center">
-              <h3 className="text-xl font-semibold mb-3 text-[#111111]">1. Qisqa surovnoma</h3>
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="bg-cream p-6 rounded-lg shadow-sm">
+              <div className="text-4xl font-bold text-gold mb-4">1</div>
+              <h3 className="text-xl font-semibold mb-3 text-[#111111]">Qisqa surovnoma</h3>
               <p className="text-gray-700">
                 Yoshi, xarakteringiz va yoqtirgan atirlaringiz haqida bir nechta savollarga javob berasiz.
               </p>
             </div>
-            <div className="bg-cream p-6 rounded-lg shadow-sm text-center">
-              <h3 className="text-xl font-semibold mb-3 text-[#111111]">2. Shaxsiy hid profili</h3>
+            <div className="bg-cream p-6 rounded-lg shadow-sm">
+              <div className="text-4xl font-bold text-gold mb-4">2</div>
+              <h3 className="text-xl font-semibold mb-3 text-[#111111]">Shaxsiy hid profili</h3>
               <p className="text-gray-700">
                 Javoblaringiz asosida sizga mos hid yo'nalishi tanlanadi.
               </p>
             </div>
-            <div className="bg-cream p-6 rounded-lg shadow-sm text-center">
-              <h3 className="text-xl font-semibold mb-3 text-[#111111]">3. Probnik va flakon</h3>
+            <div className="bg-cream p-6 rounded-lg shadow-sm">
+              <div className="text-4xl font-bold text-gold mb-4">3</div>
+              <h3 className="text-xl font-semibold mb-3 text-[#111111]">Probnik va flakon</h3>
               <p className="text-gray-700">
                 Avval 10 ml probnikni sinab ko'rasiz, yoqsa 50 yoki 100 ml flakon buyurtma qilasiz.
               </p>
@@ -350,12 +294,8 @@ function LandingPage({ onNavigate }) {
               </ul>
             </div>
             <div className="bg-white p-8 rounded-lg shadow-lg">
-              <div className="aspect-square bg-cream rounded-lg flex items-center justify-center mb-6">
-                <div className="text-center">
-                  <p className="text-sm text-gray-600">
-                    <img src={probnik} alt="Probnik" className="w-full h-full object-contain" />
-                  </p>
-                </div>
+              <div className="aspect-square bg-cream rounded-lg flex items-center justify-center mb-6 overflow-hidden">
+                <img src={probnik} alt="Probnik" className="w-full h-full object-contain rounded-lg" />
               </div>
               <button
                 onClick={() => scrollToSection('contact')}
@@ -370,28 +310,28 @@ function LandingPage({ onNavigate }) {
 
       {/* Fragrance Directions Section */}
       <section id="directions" className="py-20 px-4 bg-white">
-        <div className="container mx-auto max-w-5xl">
+        <div className="container mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-[#111111]">
             HIDIM hid yo'nalishlari
           </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-cream p-6 rounded-lg shadow-sm text-center">
-              <span className="text-4xl mb-4 block">🌿</span>
-              <h3 className="text-xl font-semibold mb-2 text-[#111111]">Fresh</h3>
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="bg-cream p-8 rounded-lg shadow-sm text-center">
+              <div className="text-4xl mb-4">🌿</div>
+              <h3 className="text-xl font-semibold mb-3 text-[#111111]">Fresh</h3>
               <p className="text-gray-700">
                 Sauvage, Bleu de Chanel ruhidagi toza, yangicha, energiyali hidlar.
               </p>
             </div>
-            <div className="bg-cream p-6 rounded-lg shadow-sm text-center">
-              <span className="text-4xl mb-4 block">🍯</span>
-              <h3 className="text-xl font-semibold mb-2 text-[#111111]">Sweet & Oriental</h3>
+            <div className="bg-cream p-8 rounded-lg shadow-sm text-center">
+              <div className="text-4xl mb-4">🍯</div>
+              <h3 className="text-xl font-semibold mb-3 text-[#111111]">Sweet & Oriental</h3>
               <p className="text-gray-700">
                 Vanilla, amber, oud notalari bilan issiq, chiroyli hidi yo'nalishlari.
               </p>
             </div>
-            <div className="bg-cream p-6 rounded-lg shadow-sm text-center">
-              <span className="text-4xl mb-4 block">🌊</span>
-              <h3 className="text-xl font-semibold mb-2 text-[#111111]">Ocean & Marine</h3>
+            <div className="bg-cream p-8 rounded-lg shadow-sm text-center">
+              <div className="text-4xl mb-4">🌊</div>
+              <h3 className="text-xl font-semibold mb-3 text-[#111111]">Ocean & Marine</h3>
               <p className="text-gray-700">
                 Megamare va dengiz shamoli uslubida nam, sho'r, sof hidlar.
               </p>
@@ -402,19 +342,20 @@ function LandingPage({ onNavigate }) {
 
       {/* Pricing Section */}
       <section id="pricing" className="py-20 px-4 bg-cream">
-        <div className="container mx-auto max-w-5xl">
+        <div className="container mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-[#111111]">
             Narxlar
           </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Probnik Card */}
-            <div className="bg-white rounded-lg shadow-lg p-8 text-center relative">
-              <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gold text-white text-xs font-semibold px-3 py-1 rounded-full">
-                Yangi mijozlar uchun
-              </span>
-              <h3 className="text-xl font-semibold mb-2 text-[#111111]">10 ml Probnik</h3>
-              <p className="text-4xl font-bold text-gold mb-2">45 000 so'm</p>
-              <p className="text-sm text-gray-600 mb-6">2-probnik — 35 000 so'm</p>
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="bg-white p-8 rounded-lg shadow-lg">
+              <div className="text-center mb-6">
+                <span className="inline-block bg-gold/20 text-gold text-xs px-3 py-1 rounded-full mb-4">
+                  Yangi mijozlar uchun
+                </span>
+                <h3 className="text-xl font-semibold mb-2 text-[#111111]">10 ml Probnik</h3>
+                <p className="text-3xl font-bold text-gold mb-2">45 000 so'm</p>
+                <p className="text-sm text-gray-600">2-probnik — 35 000 so'm</p>
+              </div>
               <button
                 onClick={() => scrollToSection('contact')}
                 className="w-full bg-[#111111] text-white px-6 py-3 rounded-md hover:bg-gold transition-colors font-medium"
@@ -422,15 +363,15 @@ function LandingPage({ onNavigate }) {
                 Buyurtma berish
               </button>
             </div>
-
-            {/* 50 ml EDP Card */}
-            <div className="bg-white rounded-lg shadow-lg p-8 text-center relative">
-              <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#111111] text-white text-xs font-semibold px-3 py-1 rounded-full">
-                Eng ommabop
-              </span>
-              <h3 className="text-xl font-semibold mb-2 text-[#111111]">50 ml Eau de Parfum</h3>
-              <p className="text-4xl font-bold text-gold mb-2">299 000 so'm</p>
-              <p className="text-sm text-gray-600 mb-6">Sizga mos shaxsiy hid asosida tayyorlanadi.</p>
+            <div className="bg-white p-8 rounded-lg shadow-lg border-2 border-gold">
+              <div className="text-center mb-6">
+                <span className="inline-block bg-gold text-white text-xs px-3 py-1 rounded-full mb-4">
+                  Eng ommabop
+                </span>
+                <h3 className="text-xl font-semibold mb-2 text-[#111111]">50 ml Eau de Parfum</h3>
+                <p className="text-3xl font-bold text-gold mb-2">299 000 so'm</p>
+                <p className="text-sm text-gray-600">Sizga mos shaxsiy hid asosida tayyorlanadi.</p>
+              </div>
               <button
                 onClick={() => scrollToSection('contact')}
                 className="w-full bg-[#111111] text-white px-6 py-3 rounded-md hover:bg-gold transition-colors font-medium"
@@ -438,15 +379,15 @@ function LandingPage({ onNavigate }) {
                 Buyurtma berish
               </button>
             </div>
-
-            {/* 100 ml EDP Card */}
-            <div className="bg-white rounded-lg shadow-lg p-8 text-center relative">
-              <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-brown text-white text-xs font-semibold px-3 py-1 rounded-full">
-                Premium
-              </span>
-              <h3 className="text-xl font-semibold mb-2 text-[#111111]">100 ml Eau de Parfum</h3>
-              <p className="text-4xl font-bold text-gold mb-2">499 000 so'm</p>
-              <p className="text-sm text-gray-600 mb-6">Oilaviy yoki uzoq muddat foydalanish uchun.</p>
+            <div className="bg-white p-8 rounded-lg shadow-lg">
+              <div className="text-center mb-6">
+                <span className="inline-block bg-brown/20 text-brown text-xs px-3 py-1 rounded-full mb-4">
+                  Premium
+                </span>
+                <h3 className="text-xl font-semibold mb-2 text-[#111111]">100 ml Eau de Parfum</h3>
+                <p className="text-3xl font-bold text-gold mb-2">499 000 so'm</p>
+                <p className="text-sm text-gray-600">Oilaviy yoki uzoq muddat foydalanish uchun.</p>
+              </div>
               <button
                 onClick={() => scrollToSection('contact')}
                 className="w-full bg-[#111111] text-white px-6 py-3 rounded-md hover:bg-gold transition-colors font-medium"
@@ -460,32 +401,32 @@ function LandingPage({ onNavigate }) {
 
       {/* Testimonials Section */}
       <section id="testimonials" className="py-20 px-4 bg-white">
-        <div className="container mx-auto max-w-5xl">
+        <div className="container mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-[#111111]">
             Mijozlar qanday fikrda?
           </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-cream p-6 rounded-lg shadow-md">
-              <p className="text-gray-700 italic mb-4">
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="bg-cream p-6 rounded-lg shadow-sm">
+              <p className="text-gray-700 mb-4 italic">
                 "Probnikdan keyin 50 ml oldim. Kiyimdan ikki kun hid ketmadi."
               </p>
-              <p className="font-semibold text-[#111111]">Sarvar</p>
+              <p className="font-semibold text-[#111111]">— Sarvar</p>
             </div>
-            <div className="bg-cream p-6 rounded-lg shadow-md">
-              <p className="text-gray-700 italic mb-4">
+            <div className="bg-cream p-6 rounded-lg shadow-sm">
+              <p className="text-gray-700 mb-4 italic">
                 "Surovnoma orqali tanlangan hid menga juda mos tushdi. Yengil, lekin sezilarli."
               </p>
-              <p className="font-semibold text-[#111111]">Dilnoza</p>
+              <p className="font-semibold text-[#111111]">— Dilnoza</p>
             </div>
-            <div className="bg-cream p-6 rounded-lg shadow-md">
-              <p className="text-gray-700 italic mb-4">
+            <div className="bg-cream p-6 rounded-lg shadow-sm">
+              <p className="text-gray-700 mb-4 italic">
                 "Yoqmasa almashtirish imkoniyati borligi uchun bemalol sinab ko'rdim."
               </p>
-              <p className="font-semibold text-[#111111]">Jamshid</p>
+              <p className="font-semibold text-[#111111]">— Jamshid</p>
             </div>
           </div>
         </div>
-      </section>
+      </section>bg-cream
 
       {/* FAQ Section */}
       <section id="faq" className="py-20 px-4 bg-cream">
@@ -544,37 +485,18 @@ function LandingPage({ onNavigate }) {
           <div className="mb-12 text-center">
             <div className="bg-cream p-6 rounded-lg max-w-md mx-auto">
               <h3 className="text-xl font-semibold mb-4 text-[#111111]">Gmail orqali ro'yxatdan o'ting</h3>
-              
-              {/* Google OAuth Button */}
-              <button
-                onClick={handleGoogleLogin}
-                disabled={!googleOAuthModule}
-                className="w-full bg-white border-2 border-[#111111] text-[#111111] px-6 py-3 rounded-md hover:bg-[#111111] hover:text-white transition-colors font-medium mb-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                </svg>
-                Google orqali ro'yxatdan o'tish
-              </button>
-
-              <div className="relative my-4">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300"></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-cream text-gray-500">yoki</span>
-                </div>
-              </div>
-
               {!showSignUp ? (
                 <button
                   onClick={() => setShowSignUp(true)}
-                  className="w-full bg-white border-2 border-gray-300 text-[#111111] px-6 py-3 rounded-md hover:bg-gray-50 transition-colors font-medium"
+                  className="w-full bg-white border-2 border-[#111111] text-[#111111] px-6 py-3 rounded-md hover:bg-[#111111] hover:text-white transition-colors font-medium mb-3 flex items-center justify-center gap-2"
                 >
-                  Email va parol bilan ro'yxatdan o'tish
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                  </svg>
+                  Gmail orqali ro'yxatdan o'tish
                 </button>
               ) : (
                 <form onSubmit={handleSignUp} className="space-y-4">
@@ -716,8 +638,8 @@ function LandingPage({ onNavigate }) {
               </button>
             </form>
             <div className="bg-cream p-8 rounded-lg">
-              <h3 className="text-xl font-bold text-[#111111] mb-4">Biz bilan bog'lanish</h3>
-              <div className="space-y-3 text-gray-700">
+              <h3 className="text-xl font-semibold mb-6 text-[#111111]">Kontakt ma'lumotlari</h3>
+              <div className="space-y-4">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Telegram</p>
                   <a href="https://t.me/hidim_parfum" className="text-gold hover:underline">
@@ -756,6 +678,12 @@ function LandingPage({ onNavigate }) {
               <a href="#" className="text-gray-400 hover:text-gold transition-colors">
                 Foydalanish shartlari
               </a>
+              <button
+                onClick={() => onNavigate('admin')}
+                className="text-gray-400 hover:text-gold transition-colors"
+              >
+                Admin
+              </button>
             </div>
           </div>
         </div>
@@ -766,19 +694,6 @@ function LandingPage({ onNavigate }) {
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home')
-
-  // URL orqali admin panelga kirish
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search)
-    if (urlParams.get('admin') === 'true' || urlParams.get('admin') === '1') {
-      setCurrentPage('admin')
-    }
-    
-    // Hash orqali ham kirish mumkin (#admin)
-    if (window.location.hash === '#admin') {
-      setCurrentPage('admin')
-    }
-  }, [])
 
   if (currentPage === 'survey') {
     return <Survey onNavigate={() => setCurrentPage('home')} />

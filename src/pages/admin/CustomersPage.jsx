@@ -1,22 +1,41 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { customersAPI } from '../../services/api'
 
 function CustomersPage() {
   const [searchQuery, setSearchQuery] = useState('')
+  const [customers, setCustomers] = useState([])
+  const [loading, setLoading] = useState(true)
   
-  const customers = [
-    { name: "Sarvar", age: 28, gender: "Erkak", phone: "+998901234567", orders: 3, profile: "Fresh" },
-    { name: "Dilnoza", age: 25, gender: "Ayol", phone: "+998901234568", orders: 2, profile: "Sweet & Oriental" },
-    { name: "Jamshid", age: 32, gender: "Erkak", phone: "+998901234569", orders: 1, profile: "Ocean & Marine" },
-    { name: "Aziza", age: 24, gender: "Ayol", phone: "+998901234570", orders: 1, profile: "Fresh" },
-    { name: "Farhod", age: 30, gender: "Erkak", phone: "+998901234571", orders: 2, profile: "Sweet & Oriental" },
-    { name: "Madina", age: 27, gender: "Ayol", phone: "+998901234572", orders: 1, profile: "Ocean & Marine" },
-  ]
+  useEffect(() => {
+    loadCustomers()
+  }, [])
+
+  const loadCustomers = async () => {
+    try {
+      setLoading(true)
+      const data = await customersAPI.getAll()
+      setCustomers(data)
+    } catch (error) {
+      console.error('Error loading customers:', error)
+      alert('Mijozlarni yuklashda xatolik yuz berdi')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const filteredCustomers = customers.filter(customer => {
     const query = searchQuery.toLowerCase()
-    return customer.name.toLowerCase().includes(query) || 
-           customer.phone.includes(query)
+    return customer.name?.toLowerCase().includes(query) || 
+           customer.phone?.includes(query)
   })
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-gray-600">Yuklanmoqda...</p>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -48,20 +67,26 @@ function CustomersPage() {
               </tr>
             </thead>
             <tbody>
-              {filteredCustomers.map((customer, index) => (
-                <tr key={index} className="border-b border-gray-100 hover:bg-cream/50">
-                  <td className="py-3 px-4 text-sm text-gray-700 font-medium">{customer.name}</td>
-                  <td className="py-3 px-4 text-sm text-gray-700">{customer.age}</td>
-                  <td className="py-3 px-4 text-sm text-gray-700">{customer.gender}</td>
-                  <td className="py-3 px-4 text-sm text-gray-700">{customer.phone}</td>
-                  <td className="py-3 px-4 text-sm text-gray-700">{customer.orders}</td>
-                  <td className="py-3 px-4">
-                    <span className="inline-block px-2 py-1 text-xs rounded-full bg-gold/20 text-gold">
-                      {customer.profile}
-                    </span>
-                  </td>
+              {filteredCustomers.length > 0 ? (
+                filteredCustomers.map((customer, index) => (
+                  <tr key={customer.id || index} className="border-b border-gray-100 hover:bg-cream/50">
+                    <td className="py-3 px-4 text-sm text-gray-700 font-medium">{customer.name}</td>
+                    <td className="py-3 px-4 text-sm text-gray-700">{customer.age}</td>
+                    <td className="py-3 px-4 text-sm text-gray-700">{customer.gender}</td>
+                    <td className="py-3 px-4 text-sm text-gray-700">{customer.phone}</td>
+                    <td className="py-3 px-4 text-sm text-gray-700">{customer.orders || 0}</td>
+                    <td className="py-3 px-4">
+                      <span className="inline-block px-2 py-1 text-xs rounded-full bg-gold/20 text-gold">
+                        {customer.profile || 'Aniqlanmagan'}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6" className="py-4 text-center text-gray-500">Mijozlar topilmadi</td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
@@ -71,4 +96,3 @@ function CustomersPage() {
 }
 
 export default CustomersPage
-

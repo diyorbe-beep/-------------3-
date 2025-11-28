@@ -1,20 +1,32 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { ordersAPI } from '../../services/api'
 
 function OrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState(null)
-  const [orders, setOrders] = useState([
-    { id: "#001", date: "2025-11-28", customer: "Sarvar", phone: "+998901234567", product: "50 ml EDP", price: "299 000", status: "Tayyorlanmoqda", comment: "Yengil hid kerak", address: "Toshkent sh., Chilonzor t., 15-uy", profile: "Fresh" },
-    { id: "#002", date: "2025-11-28", customer: "Dilnoza", phone: "+998901234568", product: "10 ml Probnik", price: "45 000", status: "Yangi", comment: "", address: "Toshkent sh., Yunusobod t., 20-uy", profile: "Sweet & Oriental" },
-    { id: "#003", date: "2025-11-27", customer: "Jamshid", phone: "+998901234569", product: "100 ml EDP", price: "499 000", status: "Yo'lda", comment: "Kuchli hid", address: "Toshkent sh., Mirzo Ulug'bek t., 5-uy", profile: "Ocean & Marine" },
-    { id: "#004", date: "2025-11-27", customer: "Aziza", phone: "+998901234570", product: "10 ml Probnik", price: "45 000", status: "Yetkazildi", comment: "", address: "Toshkent sh., Shayxontohur t., 12-uy", profile: "Fresh" },
-    { id: "#005", date: "2025-11-26", customer: "Farhod", phone: "+998901234571", product: "50 ml EDP", price: "299 000", status: "Tayyorlanmoqda", comment: "Romantik hid", address: "Toshkent sh., Sergeli t., 8-uy", profile: "Sweet & Oriental" },
-  ])
-
+  const [orders, setOrders] = useState([])
+  const [loading, setLoading] = useState(true)
   const [filters, setFilters] = useState({
     status: '',
     product: '',
     date: ''
   })
+
+  useEffect(() => {
+    loadOrders()
+  }, [])
+
+  const loadOrders = async () => {
+    try {
+      setLoading(true)
+      const data = await ordersAPI.getAll()
+      setOrders(data)
+    } catch (error) {
+      console.error('Error loading orders:', error)
+      alert('Buyurtmalarni yuklashda xatolik yuz berdi')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const statusOptions = ['', 'Yangi', 'Tayyorlanmoqda', "Yo'lda", 'Yetkazildi']
   const productOptions = ['', '10 ml Probnik', '50 ml EDP', '100 ml EDP']
@@ -26,11 +38,18 @@ function OrdersPage() {
     return true
   })
 
-  const handleStatusChange = (orderId, newStatus) => {
-    setOrders(orders.map(order => 
-      order.id === orderId ? { ...order, status: newStatus } : order
-    ))
-    setSelectedOrder({ ...selectedOrder, status: newStatus })
+  const handleStatusChange = async (orderId, newStatus) => {
+    try {
+      await ordersAPI.update(orderId, { status: newStatus })
+      setOrders(orders.map(order => 
+        order.id === orderId ? { ...order, status: newStatus } : order
+      ))
+      setSelectedOrder({ ...selectedOrder, status: newStatus })
+      alert('Holat yangilandi!')
+    } catch (error) {
+      console.error('Error updating order:', error)
+      alert('Holatni yangilashda xatolik yuz berdi')
+    }
   }
 
   const getStatusBadge = (status) => {
@@ -41,6 +60,14 @@ function OrdersPage() {
       'Yetkazildi': 'bg-green-100 text-green-700',
     }
     return colors[status] || 'bg-gray-100 text-gray-700'
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-gray-600">Yuklanmoqda...</p>
+      </div>
+    )
   }
 
   return (
@@ -104,29 +131,35 @@ function OrdersPage() {
               </tr>
             </thead>
             <tbody>
-              {filteredOrders.map((order) => (
-                <tr key={order.id} className="border-b border-gray-100 hover:bg-cream/50">
-                  <td className="py-3 px-4 text-sm text-gray-700">{order.id}</td>
-                  <td className="py-3 px-4 text-sm text-gray-700">{order.date}</td>
-                  <td className="py-3 px-4 text-sm text-gray-700">{order.customer}</td>
-                  <td className="py-3 px-4 text-sm text-gray-700">{order.phone}</td>
-                  <td className="py-3 px-4 text-sm text-gray-700">{order.product}</td>
-                  <td className="py-3 px-4 text-sm text-gray-700">{order.price}</td>
-                  <td className="py-3 px-4">
-                    <span className={`inline-block px-2 py-1 text-xs rounded-full ${getStatusBadge(order.status)}`}>
-                      {order.status}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4">
-                    <button
-                      onClick={() => setSelectedOrder(order)}
-                      className="text-gold hover:text-brown text-sm font-medium"
-                    >
-                      Ko'rish
-                    </button>
-                  </td>
+              {filteredOrders.length > 0 ? (
+                filteredOrders.map((order) => (
+                  <tr key={order.id} className="border-b border-gray-100 hover:bg-cream/50">
+                    <td className="py-3 px-4 text-sm text-gray-700">{order.id}</td>
+                    <td className="py-3 px-4 text-sm text-gray-700">{order.date}</td>
+                    <td className="py-3 px-4 text-sm text-gray-700">{order.customer}</td>
+                    <td className="py-3 px-4 text-sm text-gray-700">{order.phone}</td>
+                    <td className="py-3 px-4 text-sm text-gray-700">{order.product}</td>
+                    <td className="py-3 px-4 text-sm text-gray-700">{order.price}</td>
+                    <td className="py-3 px-4">
+                      <span className={`inline-block px-2 py-1 text-xs rounded-full ${getStatusBadge(order.status)}`}>
+                        {order.status}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4">
+                      <button
+                        onClick={() => setSelectedOrder(order)}
+                        className="text-gold hover:text-brown text-sm font-medium"
+                      >
+                        Ko'rish
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="8" className="py-4 text-center text-gray-500">Buyurtmalar topilmadi</td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
@@ -170,11 +203,11 @@ function OrdersPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Hid profili</label>
-                  <p className="text-gray-900">{selectedOrder.profile}</p>
+                  <p className="text-gray-900">{selectedOrder.profile || 'Aniqlanmagan'}</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Manzil</label>
-                  <p className="text-gray-900">{selectedOrder.address}</p>
+                  <p className="text-gray-900">{selectedOrder.address || 'Manzil kiritilmagan'}</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Izoh</label>
@@ -211,4 +244,3 @@ function OrdersPage() {
 }
 
 export default OrdersPage
-

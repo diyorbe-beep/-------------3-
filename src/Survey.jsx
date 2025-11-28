@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { surveysAPI } from './services/api'
 import './App.css'
 
 function Survey({ onNavigate }) {
@@ -33,11 +34,27 @@ function Survey({ onNavigate }) {
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log('Survey submitted:', formData)
-    alert('Surovnoma muvaffaqiyatli yuborildi! Tez orada sizga mos hid yo\'nalishi bilan bog\'lanamiz.')
-    // Keyinchalik API ga yuboriladi
+    try {
+      await surveysAPI.create(formData)
+      alert('Surovnoma muvaffaqiyatli yuborildi! Tez orada sizga mos hid yo\'nalishi bilan bog\'lanamiz.')
+      setFormData({
+        name: '',
+        age: '',
+        gender: '',
+        season: '',
+        character: [],
+        favoritePerfumes: '',
+        dislikedScents: '',
+        intensity: '',
+        occasion: '',
+        phone: ''
+      })
+    } catch (error) {
+      console.error('Error submitting survey:', error)
+      alert('Surovnoma yuborishda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.')
+    }
   }
 
   return (

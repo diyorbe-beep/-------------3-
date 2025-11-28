@@ -1,39 +1,66 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { profilesAPI } from '../../services/api'
 
 function FragranceProfilesPage() {
-  const [profiles, setProfiles] = useState([
-    { 
-      name: "Fresh", 
-      code: "FRESH_01", 
-      description: "Sauvage, Bleu de Chanel ruhidagi toza, yangicha, energiyali hidlar.",
-      customers: 45
-    },
-    { 
-      name: "Sweet & Oriental", 
-      code: "SWEET_01", 
-      description: "Vanilla, amber, oud notalari bilan issiq, chiroyli hidi yo'nalishlari.",
-      customers: 32
-    },
-    { 
-      name: "Ocean & Marine", 
-      code: "OCEAN_01", 
-      description: "Megamare va dengiz shamoli uslubida nam, sho'r, sof hidlar.",
-      customers: 28
-    },
-  ])
-
+  const [profiles, setProfiles] = useState([])
   const [showForm, setShowForm] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [formData, setFormData] = useState({
     name: '',
     code: '',
     description: ''
   })
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    loadProfiles()
+  }, [])
+
+  const loadProfiles = async () => {
+    try {
+      setLoading(true)
+      const data = await profilesAPI.getAll()
+      setProfiles(data)
+    } catch (error) {
+      console.error('Error loading profiles:', error)
+      alert('Profillarni yuklashda xatolik yuz berdi')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    setProfiles([...profiles, { ...formData, customers: 0 }])
-    setFormData({ name: '', code: '', description: '' })
-    setShowForm(false)
+    try {
+      const newProfile = await profilesAPI.create(formData)
+      setProfiles([...profiles, newProfile])
+      setFormData({ name: '', code: '', description: '' })
+      setShowForm(false)
+      alert('Profil muvaffaqiyatli qo\'shildi!')
+    } catch (error) {
+      console.error('Error creating profile:', error)
+      alert('Profil qo\'shishda xatolik yuz berdi')
+    }
+  }
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Bu profilni o\'chirishni xohlaysizmi?')) {
+      try {
+        await profilesAPI.delete(id)
+        setProfiles(profiles.filter(p => p.id != id))
+        alert('Profil o\'chirildi!')
+      } catch (error) {
+        console.error('Error deleting profile:', error)
+        alert('Profilni o\'chirishda xatolik yuz berdi')
+      }
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-gray-600">Yuklanmoqda...</p>
+      </div>
+    )
   }
 
   return (
@@ -98,14 +125,22 @@ function FragranceProfilesPage() {
 
       {/* Profiles Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {profiles.map((profile, index) => (
-          <div key={index} className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-            <h3 className="text-xl font-semibold text-[#111111] mb-2">{profile.name}</h3>
+        {profiles.map((profile) => (
+          <div key={profile.id} className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-start justify-between mb-2">
+              <h3 className="text-xl font-semibold text-[#111111]">{profile.name}</h3>
+              <button
+                onClick={() => handleDelete(profile.id)}
+                className="text-red-500 hover:text-red-700 text-sm"
+              >
+                ×
+              </button>
+            </div>
             <p className="text-sm text-gray-600 mb-2">Kod: {profile.code}</p>
             <p className="text-sm text-gray-700 mb-4">{profile.description}</p>
             <div className="pt-4 border-t border-gray-200">
               <p className="text-sm text-gray-600">
-                Nechta mijozda tanlangan: <span className="font-semibold text-gold">{profile.customers}</span>
+                Nechta mijozda tanlangan: <span className="font-semibold text-gold">{profile.customers || 0}</span>
               </p>
             </div>
           </div>
@@ -116,4 +151,3 @@ function FragranceProfilesPage() {
 }
 
 export default FragranceProfilesPage
-

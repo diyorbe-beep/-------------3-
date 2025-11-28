@@ -1,24 +1,59 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { settingsAPI } from '../../services/api'
 
 function SettingsPage() {
   const [settings, setSettings] = useState({
-    telegram: "@hidim_parfum",
-    instagram: "@hidim.official",
-    email: "info@hidim.uz",
-    phone: "+998901234567",
-    probnikPrice: "45000",
-    price50ml: "299000",
-    price100ml: "499000"
+    telegram: "",
+    instagram: "",
+    email: "",
+    phone: "",
+    probnikPrice: "",
+    price50ml: "",
+    price100ml: ""
   })
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    loadSettings()
+  }, [])
+
+  const loadSettings = async () => {
+    try {
+      setLoading(true)
+      const data = await settingsAPI.get()
+      setSettings(data)
+    } catch (error) {
+      console.error('Error loading settings:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleChange = (e) => {
     setSettings({ ...settings, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    alert('Sozlamalar saqlandi!')
-    console.log('Settings saved:', settings)
+    try {
+      setSaving(true)
+      await settingsAPI.update(settings)
+      alert('Sozlamalar saqlandi!')
+    } catch (error) {
+      console.error('Error saving settings:', error)
+      alert('Sozlamalarni saqlashda xatolik yuz berdi')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-gray-600">Yuklanmoqda...</p>
+      </div>
+    )
   }
 
   return (
@@ -119,9 +154,10 @@ function SettingsPage() {
           <div className="flex justify-end pt-4">
             <button
               type="submit"
-              className="px-8 py-3 bg-[#111111] text-white rounded-lg hover:bg-gold transition-colors font-medium"
+              disabled={saving}
+              className="px-8 py-3 bg-[#111111] text-white rounded-lg hover:bg-gold transition-colors font-medium disabled:opacity-50"
             >
-              Saqlash
+              {saving ? 'Saqlanmoqda...' : 'Saqlash'}
             </button>
           </div>
         </form>
@@ -131,4 +167,3 @@ function SettingsPage() {
 }
 
 export default SettingsPage
-
