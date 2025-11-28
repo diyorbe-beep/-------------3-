@@ -681,12 +681,6 @@ function LandingPage({ onNavigate }) {
               <a href="#" className="text-gray-400 hover:text-gold transition-colors">
                 Foydalanish shartlari
               </a>
-              <button
-                onClick={() => onNavigate('admin')}
-                className="text-gray-400 hover:text-gold transition-colors"
-              >
-                Admin
-              </button>
             </div>
           </div>
         </div>
@@ -703,6 +697,7 @@ function App() {
   }
 
   if (currentPage === 'admin') {
+    const AdminPanel = require('./pages/admin/AdminPanel').default
     return <AdminPanel />
   }
 

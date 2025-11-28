@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import Survey from './Survey.jsx'
-import AdminPanel from './pages/admin/AdminPanel.jsx'
 import probnik from './assets/image.png'
 
 function LandingPage({ onNavigate }) {
@@ -681,12 +680,6 @@ function LandingPage({ onNavigate }) {
               <a href="#" className="text-gray-400 hover:text-gold transition-colors">
                 Foydalanish shartlari
               </a>
-              <button
-                onClick={() => onNavigate('admin')}
-                className="text-gray-400 hover:text-gold transition-colors"
-              >
-                Admin
-              </button>
             </div>
           </div>
         </div>
@@ -703,6 +696,7 @@ function App() {
   }
 
   if (currentPage === 'admin') {
+    const AdminPanel = require('./pages/admin/AdminPanel').default
     return <AdminPanel />
   }
 
