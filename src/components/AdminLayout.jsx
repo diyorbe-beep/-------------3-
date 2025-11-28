@@ -53,7 +53,18 @@ function AdminLayout({ children, currentPage, onNavigate, onBack }) {
         {/* Topbar */}
         <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-[#111111]">HIDIM Admin</h2>
+            <div className="flex items-center gap-4">
+              {onBack && (
+                <button
+                  onClick={onBack}
+                  className="text-gray-600 hover:text-[#111111] transition-colors flex items-center gap-2"
+                >
+                  <span>←</span>
+                  <span className="text-sm">Asosiy sahifa</span>
+                </button>
+              )}
+              <h2 className="text-xl font-semibold text-[#111111]">HIDIM Admin</h2>
+            </div>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gold rounded-full flex items-center justify-center text-[#111111] font-semibold">
                 A
