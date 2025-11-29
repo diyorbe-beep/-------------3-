@@ -73,3 +73,4 @@ Production'ga deploy qilganda:
    - **Authorized redirect URIs**: `https://yourdomain.com`
 2. `.env` faylida `VITE_GOOGLE_CLIENT_ID` ni tekshiring
 
+
