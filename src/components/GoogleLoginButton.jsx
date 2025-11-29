@@ -4,6 +4,7 @@ import { customersAPI } from '../services/api'
 export default function GoogleLoginButton({ onSuccess, onError }) {
   // useGoogleLogin hook ni ishlatish - GoogleOAuthProvider ichida bo'lishi kerak
   const handleGoogleLogin = useGoogleLogin({
+    flow: 'implicit', // implicit flow ishlatamiz (browser-based)
     onSuccess: async (tokenResponse) => {
       try {
         console.log('Google OAuth token olingan:', tokenResponse)
@@ -80,7 +81,6 @@ export default function GoogleLoginButton({ onSuccess, onError }) {
         alert('Google orqali ro\'yxatdan o\'tishda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.')
       }
     },
-    flow: 'implicit', // implicit flow ishlatamiz (browser-based)
   })
 
   return (

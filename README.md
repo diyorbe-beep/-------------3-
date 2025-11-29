@@ -111,15 +111,18 @@ Gmail orqali ro'yxatdan o'tish uchun Google OAuth Client ID kerak:
    VITE_GOOGLE_CLIENT_ID=your-google-client-id-here
    ```
 
-2. **Google Cloud Console sozlash**:
+2. **Google Cloud Console sozlash** (MUHIM!):
    - https://console.cloud.google.com/ → APIs & Services > Credentials
-   - OAuth 2.0 Client ID ni tekshiring
-   - **Authorized JavaScript origins** ga qo'shing:
-     - `http://localhost:5173` (development)
-     - Production domain (agar mavjud bo'lsa)
-   - **Authorized redirect URIs** ga qo'shing:
-     - `http://localhost:5173` (development)
-     - Production domain (agar mavjud bo'lsa)
+   - OAuth 2.0 Client ID ni oching (yoki yarating)
+   - **Authorized JavaScript origins** bo'limiga qo'shing:
+     - `http://localhost:5173` (development uchun)
+     - `http://localhost:3000` (agar boshqa port ishlatilsa)
+   - **Authorized redirect URIs** bo'limiga qo'shing:
+     - `http://localhost:5173` (development uchun - MUHIM!)
+     - `http://localhost:5173/` (slash bilan ham qo'shing)
+     - `http://localhost:3000` (agar boshqa port ishlatilsa)
+   - **Eslatma**: Agar `redirect_uri_mismatch` xatosi chiqsa, bu bo'limlarda `http://localhost:5173` mavjudligini tekshiring
+   - O'zgarishlarni saqlang va 5-10 daqiqa kutib, qayta urinib ko'ring
 
 3. **Paket o'rnatish** (agar o'rnatilmagan bo'lsa):
    ```bash

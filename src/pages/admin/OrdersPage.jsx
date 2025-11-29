@@ -145,6 +145,7 @@ function OrdersPage() {
                 <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">ID</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Sana</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Mijoz</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Email</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Telefon</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Mahsulot</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Narx</th>
@@ -158,7 +159,8 @@ function OrdersPage() {
                   <tr key={order.id} className="border-b border-gray-100 hover:bg-cream/50">
                     <td className="py-3 px-4 text-sm text-gray-700">{order.id}</td>
                     <td className="py-3 px-4 text-sm text-gray-700">{order.date}</td>
-                    <td className="py-3 px-4 text-sm text-gray-700">{order.customer}</td>
+                    <td className="py-3 px-4 text-sm text-gray-700 font-medium">{order.customer}</td>
+                    <td className="py-3 px-4 text-sm text-gray-700">{order.email || 'Aniqlanmagan'}</td>
                     <td className="py-3 px-4 text-sm text-gray-700">{order.phone}</td>
                     <td className="py-3 px-4 text-sm text-gray-700">{order.product}</td>
                     <td className="py-3 px-4 text-sm text-gray-700">{order.price}</td>
@@ -179,7 +181,7 @@ function OrdersPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="8" className="py-4 text-center text-gray-500">Buyurtmalar topilmadi</td>
+                  <td colSpan="9" className="py-4 text-center text-gray-500">Buyurtmalar topilmadi</td>
                 </tr>
               )}
             </tbody>
@@ -210,6 +212,10 @@ function OrdersPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Mijoz</label>
                   <p className="text-gray-900">{selectedOrder.customer}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <p className="text-gray-900">{selectedOrder.email || 'Aniqlanmagan'}</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Telefon</label>

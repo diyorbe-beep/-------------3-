@@ -4,6 +4,7 @@ function AdminLayout({ children, currentPage, onNavigate, onBack }) {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: '📊' },
     { id: 'orders', label: 'Buyurtmalar', icon: '📦' },
+    { id: 'surveys', label: 'So\'rovlar', icon: '📝' },
     { id: 'customers', label: 'Mijozlar', icon: '👥' },
     { id: 'profiles', label: 'Hid profillari', icon: '🌸' },
     { id: 'discounts', label: 'Chegirmalar', icon: '🎁' },

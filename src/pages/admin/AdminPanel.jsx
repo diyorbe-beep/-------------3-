@@ -7,6 +7,7 @@ import FragranceProfilesPage from './FragranceProfilesPage'
 import DiscountsPage from './DiscountsPage'
 import FeedbackPage from './FeedbackPage'
 import SettingsPage from './SettingsPage'
+import SurveysPage from './SurveysPage'
 
 function AdminPanel({ onNavigate }) {
   const [currentPage, setCurrentPage] = useState('dashboard')
@@ -25,6 +26,8 @@ function AdminPanel({ onNavigate }) {
         return <DiscountsPage />
       case 'feedback':
         return <FeedbackPage />
+      case 'surveys':
+        return <SurveysPage />
       case 'settings':
         return <SettingsPage />
       default:
