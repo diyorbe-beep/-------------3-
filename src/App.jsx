@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
-import { ordersAPI, customersAPI } from './services/api'
+import { ordersAPI, customersAPI, emailAPI } from './services/api'
 import './App.css'
 import Survey from './Survey.jsx'
 import AdminPanel from './pages/admin/AdminPanel.jsx'
+import GoogleLoginButtonWrapper from './components/GoogleLoginButtonWrapper.jsx'
 import probnik from './assets/image.png'
 
 function LandingPage({ onNavigate }) {
@@ -23,7 +24,9 @@ function LandingPage({ onNavigate }) {
     email: '',
     password: ''
   })
-  const [googleOAuthModule, setGoogleOAuthModule] = useState(null)
+  const [showCodeInput, setShowCodeInput] = useState(false)
+  const [verificationCode, setVerificationCode] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -57,28 +60,15 @@ function LandingPage({ onNavigate }) {
     }
   }
 
-  // Google OAuth modulini yuklash
-  useEffect(() => {
-    import('@react-oauth/google')
-      .then((module) => {
-        setGoogleOAuthModule(module)
-      })
-      .catch((error) => {
-        console.warn('⚠️ @react-oauth/google paketi o\'rnatilmagan. Google OAuth ishlamaydi.')
-        console.warn('O\'rnatish uchun: npm install @react-oauth/google')
-      })
-  }, [])
+  // Google OAuth login funksiyasi - GoogleLoginButton komponenti orqali ishlaydi
+  const handleGoogleLoginSuccess = (userInfo) => {
+    alert(`Xush kelibsiz, ${userInfo.name || userInfo.email}! Ro'yxatdan muvaffaqiyatli o'tdingiz.`)
+    setShowSignUp(false)
+  }
 
-  // Google OAuth login funksiyasi
-  const handleGoogleLogin = () => {
-    if (!googleOAuthModule) {
-      alert('Google OAuth hali yuklanmagan yoki paket o\'rnatilmagan. Iltimos, npm install @react-oauth/google ni bajaring.')
-      return
-    }
-
-    const { useGoogleLogin } = googleOAuthModule
-    // Bu yerda hook ni ishlatib bo'lmaydi, shuning uchun boshqa yondashuv
-    alert('Google OAuth integratsiyasi ishlayapti. Paket o\'rnatilgan bo\'lsa, Google Sign-In popup ochiladi.')
+  const handleGoogleLoginError = (error) => {
+    console.error('Google login error:', error)
+    alert('Google orqali ro\'yxatdan o\'tishda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.')
   }
 
   const scrollToSection = (sectionId) => {
@@ -98,15 +88,20 @@ function LandingPage({ onNavigate }) {
         '100ml': '100 ml EDP'
       }
       
-      await ordersAPI.create({
+      const orderData = {
         customer: formData.name,
         phone: formData.phone,
         email: formData.email,
         product: productMap[formData.product] || formData.product,
         price: formData.product === '10ml' ? '45 000' : formData.product === '50ml' ? '299 000' : '499 000',
         comment: formData.comment,
-        status: 'Yangi'
-      })
+        status: 'Yangi',
+        date: new Date().toISOString().split('T')[0] // Sana qo'shamiz
+      }
+      
+      console.log('Buyurtma yuborilmoqda:', orderData)
+      const result = await ordersAPI.create(orderData)
+      console.log('Buyurtma yuborildi, javob:', result)
       
       alert('Buyurtmangiz qabul qilindi! Tez orada siz bilan bog\'lanamiz.')
       setFormData({ name: '', email: '', phone: '', product: '', comment: '' })
@@ -116,18 +111,78 @@ function LandingPage({ onNavigate }) {
     }
   }
 
-  const handleSignUp = (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault()
+    
+    // Agar kod kiritish bosqichi bo'lsa
+    if (showCodeInput) {
+      try {
+        setIsLoading(true)
+        const result = await emailAPI.verifyCode({
+          email: signUpData.email,
+          code: verificationCode
+        })
+        
+        if (result.success) {
+          // Mijozni yaratish
+          try {
+            await customersAPI.create({
+              name: signUpData.name,
+              email: signUpData.email,
+              phone: '',
+              gender: '',
+              age: '',
+              orders: 0,
+              profile: ''
+            })
+          } catch (error) {
+            console.log('Customer already exists or error:', error)
+          }
+          
+          alert('Ro\'yxatdan muvaffaqiyatli o\'tdingiz! Xush kelibsiz!')
+          setSignUpData({ name: '', email: '', password: '' })
+          setVerificationCode('')
+          setShowCodeInput(false)
+          setShowSignUp(false)
+        } else {
+          alert('Noto\'g\'ri kod. Iltimos, qayta urinib ko\'ring.')
+        }
+      } catch (error) {
+        console.error('Error verifying code:', error)
+        alert('Kodni tekshirishda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.')
+      } finally {
+        setIsLoading(false)
+      }
+      return
+    }
+    
     // Gmail formatini tekshirish
     const emailRegex = /^[^\s@]+@gmail\.com$/i
     if (!emailRegex.test(signUpData.email)) {
       alert('Iltimos, to\'g\'ri Gmail manzilini kiriting (masalan: example@gmail.com)')
       return
     }
-    console.log('Sign up:', signUpData)
-    alert('Ro\'yxatdan o\'tdingiz! Email manzilingizga tasdiqlash xabari yuborildi.')
-    setSignUpData({ name: '', email: '', password: '' })
-    setShowSignUp(false)
+    
+    // Email ga kod yuborish
+    try {
+      setIsLoading(true)
+      const result = await emailAPI.sendVerificationCode({
+        email: signUpData.email,
+        name: signUpData.name
+      })
+      
+      if (result.success) {
+        setShowCodeInput(true)
+        alert('Tasdiqlash kodi email manzilingizga yuborildi! Iltimos, kodni kiriting.')
+      } else {
+        alert('Email yuborishda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.')
+      }
+    } catch (error) {
+      console.error('Error sending verification code:', error)
+      alert('Email yuborishda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const toggleFaq = (index) => {
@@ -546,19 +601,9 @@ function LandingPage({ onNavigate }) {
               <h3 className="text-xl font-semibold mb-4 text-[#111111]">Gmail orqali ro'yxatdan o'ting</h3>
               
               {/* Google OAuth Button */}
-              <button
-                onClick={handleGoogleLogin}
-                disabled={!googleOAuthModule}
-                className="w-full bg-white border-2 border-[#111111] text-[#111111] px-6 py-3 rounded-md hover:bg-[#111111] hover:text-white transition-colors font-medium mb-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                </svg>
-                Google orqali ro'yxatdan o'tish
-              </button>
+              {/* GoogleLoginButtonWrapper ErrorBoundary bilan o'ralgan */}
+              {/* Agar GoogleOAuthProvider ichida bo'lmasa, fallback ko'rsatiladi */}
+              <GoogleLoginButtonWrapper onSuccess={handleGoogleLoginSuccess} onError={handleGoogleLoginError} />
 
               <div className="relative my-4">
                 <div className="absolute inset-0 flex items-center">
@@ -578,63 +623,111 @@ function LandingPage({ onNavigate }) {
                 </button>
               ) : (
                 <form onSubmit={handleSignUp} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2 text-[#111111]">
-                      Ismingiz
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={signUpData.name}
-                      onChange={(e) => setSignUpData({ ...signUpData, name: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
-                      placeholder="Ismingizni kiriting"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2 text-[#111111]">
-                      Gmail manzilingiz
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      value={signUpData.email}
-                      onChange={(e) => setSignUpData({ ...signUpData, email: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
-                      placeholder="example@gmail.com"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2 text-[#111111]">
-                      Parol
-                    </label>
-                    <input
-                      type="password"
-                      required
-                      value={signUpData.password}
-                      onChange={(e) => setSignUpData({ ...signUpData, password: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
-                      placeholder="Parol yarating"
-                    />
-                  </div>
-                  <div className="flex gap-3">
-                    <button
-                      type="submit"
-                      className="flex-1 bg-[#111111] text-white px-4 py-2 rounded-md hover:bg-gold transition-colors font-medium"
-                    >
-                      Ro'yxatdan o'tish
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowSignUp(false)
-                        setSignUpData({ name: '', email: '', password: '' })
-                      }}
-                      className="flex-1 bg-gray-200 text-[#111111] px-4 py-2 rounded-md hover:bg-gray-300 transition-colors font-medium"
-                    >
-                      Bekor qilish
-                    </button>
-                  </div>
+                  {!showCodeInput ? (
+                    <>
+                      <div>
+                        <label className="block text-sm font-medium mb-2 text-[#111111]">
+                          Ismingiz
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={signUpData.name}
+                          onChange={(e) => setSignUpData({ ...signUpData, name: e.target.value })}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
+                          placeholder="Ismingizni kiriting"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-2 text-[#111111]">
+                          Gmail manzilingiz
+                        </label>
+                        <input
+                          type="email"
+                          required
+                          value={signUpData.email}
+                          onChange={(e) => setSignUpData({ ...signUpData, email: e.target.value })}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
+                          placeholder="example@gmail.com"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-2 text-[#111111]">
+                          Parol
+                        </label>
+                        <input
+                          type="password"
+                          required
+                          value={signUpData.password}
+                          onChange={(e) => setSignUpData({ ...signUpData, password: e.target.value })}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
+                          placeholder="Parol yarating"
+                        />
+                      </div>
+                      <div className="flex gap-3">
+                        <button
+                          type="submit"
+                          disabled={isLoading}
+                          className="flex-1 bg-[#111111] text-white px-4 py-2 rounded-md hover:bg-gold transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isLoading ? 'Yuborilmoqda...' : 'Kod yuborish'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowSignUp(false)
+                            setSignUpData({ name: '', email: '', password: '' })
+                            setShowCodeInput(false)
+                            setVerificationCode('')
+                          }}
+                          className="flex-1 bg-gray-200 text-[#111111] px-4 py-2 rounded-md hover:bg-gray-300 transition-colors font-medium"
+                        >
+                          Bekor qilish
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
+                        <p className="text-sm text-blue-800">
+                          Tasdiqlash kodi <strong>{signUpData.email}</strong> manziliga yuborildi. Iltimos, kodni kiriting.
+                        </p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-2 text-[#111111]">
+                          Tasdiqlash kodi
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={verificationCode}
+                          onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold text-center text-2xl tracking-widest"
+                          placeholder="000000"
+                          maxLength="6"
+                        />
+                      </div>
+                      <div className="flex gap-3">
+                        <button
+                          type="submit"
+                          disabled={isLoading || verificationCode.length !== 6}
+                          className="flex-1 bg-[#111111] text-white px-4 py-2 rounded-md hover:bg-gold transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isLoading ? 'Tekshirilmoqda...' : 'Tasdiqlash'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowCodeInput(false)
+                            setVerificationCode('')
+                          }}
+                          className="flex-1 bg-gray-200 text-[#111111] px-4 py-2 rounded-md hover:bg-gray-300 transition-colors font-medium"
+                        >
+                          Ortga
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </form>
               )}
             </div>

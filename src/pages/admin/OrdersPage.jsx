@@ -13,16 +13,30 @@ function OrdersPage() {
 
   useEffect(() => {
     loadOrders()
+    // Har 10 soniyada avtomatik yangilash
+    const interval = setInterval(() => {
+      loadOrders()
+    }, 10000) // 10 soniya
+    
+    return () => clearInterval(interval)
   }, [])
 
   const loadOrders = async () => {
     try {
       setLoading(true)
       const data = await ordersAPI.getAll()
-      setOrders(data)
+      console.log('Buyurtmalar yuklandi:', data)
+      // Agar data array bo'lmasa, bo'sh array qaytaramiz
+      setOrders(Array.isArray(data) ? data : [])
     } catch (error) {
       console.error('Error loading orders:', error)
-      alert('Buyurtmalarni yuklashda xatolik yuz berdi')
+      console.error('Error details:', error.message)
+      // Xatolik bo'lsa ham bo'sh array qo'yamiz
+      setOrders([])
+      // Faqat birinchi marta xatolik bo'lsa alert ko'rsatamiz
+      if (orders.length === 0) {
+        alert(`Buyurtmalarni yuklashda xatolik yuz berdi: ${error.message}`)
+      }
     } finally {
       setLoading(false)
     }
@@ -72,7 +86,15 @@ function OrdersPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-[#111111]">Buyurtmalar</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold text-[#111111]">Buyurtmalar</h1>
+        <button
+          onClick={loadOrders}
+          className="px-4 py-2 bg-gold text-white rounded-lg hover:bg-brown transition-colors font-medium"
+        >
+          🔄 Yangilash
+        </button>
+      </div>
 
       {/* Filters */}
       <div className="bg-white rounded-lg shadow-sm p-6">

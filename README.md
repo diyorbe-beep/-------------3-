@@ -100,16 +100,41 @@ npm run dev
 
 Gmail orqali ro'yxatdan o'tish uchun Google OAuth Client ID kerak:
 
-1. **Google Cloud Console ga kiring**: https://console.cloud.google.com/
-2. **Yangi loyiha yarating** yoki mavjud loyihani tanlang
-3. **APIs & Services > Credentials** ga o'ting
-4. **Create Credentials > OAuth client ID** ni tanlang
-5. **Application type**: Web application
-6. **Authorized JavaScript origins**: `http://localhost:5173`
-7. **Authorized redirect URIs**: `http://localhost:5173`
-8. **Client ID ni oling** va `.env` fayliga qo'ying:
-   ```
-   VITE_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+### Client ID va Secret:
+- **Client ID**: `.env` faylida `VITE_GOOGLE_CLIENT_ID` sifatida saqlanadi
+- **Client Secret**: Backend uchun kerak emas (frontend faqat Client ID ishlatadi)
+
+### Frontend sozlash:
+
+1. **`.env` fayl yarating** (loyiha ildizida):
+   ```env
+   VITE_GOOGLE_CLIENT_ID=your-google-client-id-here
    ```
 
-**Eslatma**: Production uchun haqiqiy domain qo'shing!
+2. **Google Cloud Console sozlash**:
+   - https://console.cloud.google.com/ → APIs & Services > Credentials
+   - OAuth 2.0 Client ID ni tekshiring
+   - **Authorized JavaScript origins** ga qo'shing:
+     - `http://localhost:5173` (development)
+     - Production domain (agar mavjud bo'lsa)
+   - **Authorized redirect URIs** ga qo'shing:
+     - `http://localhost:5173` (development)
+     - Production domain (agar mavjud bo'lsa)
+
+3. **Paket o'rnatish** (agar o'rnatilmagan bo'lsa):
+   ```bash
+   npm install @react-oauth/google
+   ```
+
+### Qanday ishlaydi:
+
+1. Foydalanuvchi "Google orqali ro'yxatdan o'tish" tugmasini bosadi
+2. Google OAuth popup ochiladi
+3. Foydalanuvchi Gmail akkauntini tanlaydi
+4. Google user ma'lumotlari olinadi
+5. Mijoz avtomatik ro'yxatdan o'tadi
+
+**Eslatma**: 
+- Faqat Gmail akkauntlari qabul qilinadi
+- Client Secret backend da ishlatilmaydi (faqat frontend OAuth)
+- Production uchun haqiqiy domain qo'shing!

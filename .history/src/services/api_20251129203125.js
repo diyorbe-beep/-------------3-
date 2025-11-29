@@ -2,7 +2,7 @@
 // Agar VITE_API_BASE_URL mavjud bo'lsa, uni ishlatamiz
 // Aks holda, localhost yoki production URL ni ishlatamiz
 // Production serverda email endpoint mavjud emas, shuning uchun localhost ishlatamiz
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://atir.onrender.com'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
 
 // Debug: API URL ni console ga chiqarish
 console.log('🔗 API Base URL:', API_BASE_URL)

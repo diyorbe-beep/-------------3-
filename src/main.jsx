@@ -1,44 +1,33 @@
-import { StrictMode, useState, useEffect } from 'react'
+import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { GoogleOAuthProvider } from '@react-oauth/google'
 import './index.css'
 import App from './App.jsx'
 
 // Google OAuth Client ID - .env faylidan olinadi
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '842416852674-j61hmt21t7vlc33h5rlm0h9ln28qpf1s.apps.googleusercontent.com'
 
-// Google OAuth Provider - conditional wrapper
-function AppWithGoogleOAuth() {
-  const [GoogleOAuthProvider, setGoogleOAuthProvider] = useState(null)
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    // Dynamic import
-    import('@react-oauth/google')
-      .then((module) => {
-        setGoogleOAuthProvider(() => module.GoogleOAuthProvider)
-        setIsLoading(false)
-      })
-      .catch((error) => {
-        console.warn('⚠️ @react-oauth/google paketi o\'rnatilmagan. Google OAuth ishlamaydi.')
-        console.warn('O\'rnatish uchun: npm install @react-oauth/google')
-        setIsLoading(false)
-      })
-  }, [])
-
-  if (isLoading) {
-    return <App />
-  }
-
-  if (GoogleOAuthProvider) {
-    return (
-      <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID || 'dummy-client-id'}>
-        <App />
-      </GoogleOAuthProvider>
-    )
-  }
-
-  return <App />
+// Debug: Client ID ni console ga chiqarish
+console.log('🔍 Google OAuth Client ID:', GOOGLE_CLIENT_ID ? 'Mavjud ✅' : 'Topilmadi ❌')
+console.log('📋 import.meta.env.VITE_GOOGLE_CLIENT_ID:', import.meta.env.VITE_GOOGLE_CLIENT_ID)
+console.log('📋 Barcha env o\'zgaruvchilar:', Object.keys(import.meta.env).filter(key => key.startsWith('VITE_')))
+if (GOOGLE_CLIENT_ID) {
+  console.log('📋 Client ID qiymati:', GOOGLE_CLIENT_ID.substring(0, 30) + '...')
 }
+
+// Client ID ni aniqlash
+const clientIdToUse = GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID.trim() !== '' 
+  ? GOOGLE_CLIENT_ID 
+  : '842416852674-j61hmt21t7vlc33h5rlm0h9ln28qpf1s.apps.googleusercontent.com'
+
+console.log('✅ GoogleOAuthProvider ishlatilmoqda, Client ID:', clientIdToUse.substring(0, 30) + '...')
+
+// App ni render qilish
+const AppComponent = (
+  <GoogleOAuthProvider clientId={clientIdToUse}>
+    <App />
+  </GoogleOAuthProvider>
+)
 
 if (!GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID_HERE') {
   console.warn('⚠️ Google OAuth Client ID topilmadi! .env faylida VITE_GOOGLE_CLIENT_ID ni sozlang.')
@@ -46,6 +35,6 @@ if (!GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID_HERE') {
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <AppWithGoogleOAuth />
+    {AppComponent}
   </StrictMode>,
 )
