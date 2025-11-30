@@ -310,32 +310,56 @@ function SurveysPage() {
           window.location.href = pdfDataUri
         }
       } else if (isMobile) {
-        // Android va boshqa mobil brauzerlar uchun
+        // Android va boshqa mobil brauzerlar uchun - yanada ishonchli yechim
         const pdfBlob = doc.output('blob')
-        const url = URL.createObjectURL(pdfBlob)
+        const blobUrl = URL.createObjectURL(pdfBlob)
         const link = document.createElement('a')
-        link.href = url
+        link.href = blobUrl
         link.download = fileName
         link.style.display = 'none'
         document.body.appendChild(link)
-        link.click()
+        
+        // Mobil uchun MouseEvent yaratish (click() ishlamasligi mumkin)
+        const touchEvent = new MouseEvent('click', {
+          view: window,
+          bubbles: true,
+          cancelable: true,
+          buttons: 1
+        })
+        
+        // Birinchi urinish: MouseEvent
+        link.dispatchEvent(touchEvent)
+        
+        // Ikkinchi urinish: oddiy click (agar MouseEvent ishlamasa)
         setTimeout(() => {
-          document.body.removeChild(link)
-          URL.revokeObjectURL(url)
-        }, 100)
+          try {
+            link.click()
+          } catch (e) {
+            // Agar click() ishlamasa, yangi oynada ochish
+            window.open(blobUrl, '_blank')
+          }
+        }, 50)
+        
+        // Tozalash
+        setTimeout(() => {
+          if (link.parentNode) {
+            document.body.removeChild(link)
+          }
+          URL.revokeObjectURL(blobUrl)
+        }, 500)
       } else {
         // Desktop brauzerlar uchun
         const pdfBlob = doc.output('blob')
-        const url = URL.createObjectURL(pdfBlob)
+        const blobUrl = URL.createObjectURL(pdfBlob)
         const link = document.createElement('a')
-        link.href = url
+        link.href = blobUrl
         link.download = fileName
         link.style.display = 'none'
         document.body.appendChild(link)
         link.click()
         setTimeout(() => {
           document.body.removeChild(link)
-          URL.revokeObjectURL(url)
+          URL.revokeObjectURL(blobUrl)
         }, 100)
       }
     } catch (error) {
@@ -352,12 +376,33 @@ function SurveysPage() {
           link.target = '_blank'
           link.style.display = 'none'
           document.body.appendChild(link)
-          link.click()
+          
+          // Mobil uchun maxsus ishlov
+          const isMobile = /iPad|iPhone|iPod|Android/.test(navigator.userAgent) || window.innerWidth < 768
+          if (isMobile) {
+            const touchEvent = new MouseEvent('click', {
+              view: window,
+              bubbles: true,
+              cancelable: true,
+              buttons: 1
+            })
+            link.dispatchEvent(touchEvent)
+            setTimeout(() => {
+              try {
+                link.click()
+              } catch (e) {
+                window.open(pdfDataUri, '_blank')
+              }
+            }, 50)
+          } else {
+            link.click()
+          }
+          
           setTimeout(() => {
             if (link.parentNode) {
               document.body.removeChild(link)
             }
-          }, 100)
+          }, 200)
         } catch (finalError) {
           alert('PDF yuklab olishda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring yoki boshqa brauzerda sinab ko\'ring.')
         }
