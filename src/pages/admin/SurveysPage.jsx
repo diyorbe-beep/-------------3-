@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { surveysAPI } from '../../services/api'
+import jsPDF from 'jspdf'
 
 function SurveysPage() {
   const [selectedSurvey, setSelectedSurvey] = useState(null)
@@ -61,6 +62,145 @@ function SurveysPage() {
     } catch {
       return dateString
     }
+  }
+
+  // PDF yuklab olish funksiyasi
+  const handleDownloadPDF = (survey) => {
+    const doc = new jsPDF()
+    const pageWidth = doc.internal.pageSize.getWidth()
+    const pageHeight = doc.internal.pageSize.getHeight()
+    const margin = 20
+    const contentWidth = pageWidth - (margin * 2)
+    const labelWidth = 60
+    const valueX = margin + labelWidth + 5
+    
+    // Sarlavha
+    doc.setFontSize(20)
+    doc.setTextColor(17, 17, 17)
+    doc.setFont('helvetica', 'bold')
+    doc.text('HIDIM - Shaxsiy Hid Surovnomasi', pageWidth / 2, 25, { align: 'center' })
+    
+    // Sana
+    doc.setFontSize(10)
+    doc.setTextColor(100, 100, 100)
+    doc.setFont('helvetica', 'normal')
+    const surveyDate = survey.created_at || survey.createdAt || new Date().toISOString()
+    let formattedDate = 'Aniqlanmagan'
+    try {
+      const date = new Date(surveyDate)
+      formattedDate = date.toLocaleDateString('uz-UZ', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      })
+    } catch (e) {
+      formattedDate = surveyDate
+    }
+    doc.text(`Sana: ${formattedDate}`, pageWidth / 2, 35, { align: 'center' })
+    
+    let yPosition = 50
+    
+    // Helper function: maydon yozish (jadval ko'rinishida)
+    const writeField = (label, value, isMultiline = false) => {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage()
+        yPosition = 20
+      }
+      
+      const textValue = String(value || 'Kiritilmagan').trim()
+      
+      // Label (qalin shrift)
+      doc.setFontSize(11)
+      doc.setFont('helvetica', 'bold')
+      doc.setTextColor(17, 17, 17)
+      doc.text(`${label}:`, margin, yPosition)
+      
+      // Value (oddiy shrift)
+      doc.setFontSize(11)
+      doc.setFont('helvetica', 'normal')
+      doc.setTextColor(50, 50, 50)
+      
+      if (isMultiline || textValue.length > 40) {
+        // Uzun matnlar uchun qatorlarga bo'lish
+        const maxValueWidth = contentWidth - labelWidth - 10
+        const lines = doc.splitTextToSize(textValue, maxValueWidth)
+        
+        // Birinchi qator
+        if (lines.length > 0) {
+          doc.text(lines[0], valueX, yPosition)
+          yPosition += 6
+        }
+        
+        // Qolgan qatorlar
+        for (let i = 1; i < lines.length; i++) {
+          if (yPosition > pageHeight - 30) {
+            doc.addPage()
+            yPosition = 20
+          }
+          doc.text(lines[i], valueX, yPosition)
+          yPosition += 6
+        }
+      } else {
+        // Qisqa matnlar
+        doc.text(textValue, valueX, yPosition)
+        yPosition += 8
+      }
+      
+      yPosition += 4 // Maydonlar orasidagi bo'sh joy
+    }
+    
+    // Ma'lumotlar
+    writeField('Ism', survey.name)
+    writeField('Yosh', survey.age)
+    writeField('Jins', survey.gender)
+    writeField('Fasl', survey.season)
+    
+    // Xarakter
+    const character = survey.character || []
+    let characterText = 'Kiritilmagan'
+    if (Array.isArray(character) && character.length > 0) {
+      characterText = character.join(', ')
+    } else if (typeof character === 'string' && character.trim()) {
+      characterText = character
+    }
+    writeField('Xarakter', characterText, true)
+    
+    // Yoqtirgan atirlar
+    const favoritePerfumes = survey.favoritePerfumes || survey.favorite_perfumes || ''
+    writeField('Yoqtirgan atirlar', favoritePerfumes || 'Kiritilmagan', true)
+    
+    // Yoqtirmaydigan hidlar
+    const dislikedScents = survey.dislikedScents || survey.disliked_scents
+    if (dislikedScents && dislikedScents.trim()) {
+      writeField('Yoqtirmaydigan hidlar', dislikedScents, true)
+    }
+    
+    // Intensivlik
+    writeField('Intensivlik', survey.intensity)
+    
+    // Holat
+    writeField('Holat', survey.occasion)
+    
+    // Telefon
+    writeField('Telefon', survey.phone)
+    
+    // Footer (har bir sahifada)
+    const pageCount = doc.internal.getNumberOfPages()
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i)
+      doc.setFontSize(9)
+      doc.setTextColor(150, 150, 150)
+      doc.setFont('helvetica', 'normal')
+      const footerY = pageHeight - 10
+      doc.text('HIDIM - Shaxsiy parfum brendi', pageWidth / 2, footerY - 5, { align: 'center' })
+      doc.text('www.hidim.uz | @hidim_parfum', pageWidth / 2, footerY, { align: 'center' })
+    }
+    
+    // PDF yuklab olish
+    const safeName = (survey.name || 'Foydalanuvchi').replace(/[^a-zA-Z0-9А-Яа-яЁё]/g, '_').substring(0, 20)
+    const safeDate = formattedDate.replace(/[^0-9]/g, '-')
+    const fileName = `HIDIM_Surovnoma_${safeName}_${safeDate}.pdf`
+    doc.save(fileName)
   }
 
   if (loading) {
@@ -145,12 +285,24 @@ function SurveysPage() {
                     <td className="py-3 px-4 text-sm text-gray-700">{survey.gender || 'Aniqlanmagan'}</td>
                     <td className="py-3 px-4 text-sm text-gray-700">{formatDate(survey.createdAt)}</td>
                     <td className="py-3 px-4">
-                      <button
-                        onClick={() => setSelectedSurvey(survey)}
-                        className="text-gold hover:text-brown text-sm font-medium"
-                      >
-                        Ko'rish
-                      </button>
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => setSelectedSurvey(survey)}
+                          className="text-gold hover:text-brown text-sm font-medium"
+                        >
+                          Ko'rish
+                        </button>
+                        <button
+                          onClick={() => handleDownloadPDF(survey)}
+                          className="text-[#111111] hover:text-gold text-sm font-medium flex items-center gap-1"
+                          title="PDF yuklab olish"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                          PDF
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -237,7 +389,16 @@ function SurveysPage() {
                 </div>
               </div>
 
-              <div className="mt-6 flex justify-end">
+              <div className="mt-6 flex justify-end gap-3">
+                <button
+                  onClick={() => handleDownloadPDF(selectedSurvey)}
+                  className="px-6 py-2 bg-white border-2 border-[#111111] text-[#111111] rounded-lg hover:bg-cream transition-colors flex items-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  PDF yuklab olish
+                </button>
                 <button
                   onClick={() => setSelectedSurvey(null)}
                   className="px-6 py-2 bg-[#111111] text-white rounded-lg hover:bg-gold transition-colors"

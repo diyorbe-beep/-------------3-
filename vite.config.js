@@ -15,6 +15,6 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ['@react-oauth/google'],
+    include: ['@react-oauth/google', 'jspdf'],
   },
 })
