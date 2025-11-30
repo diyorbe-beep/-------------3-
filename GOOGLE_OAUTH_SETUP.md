@@ -74,3 +74,4 @@ Production'ga deploy qilganda:
 2. `.env` faylida `VITE_GOOGLE_CLIENT_ID` ni tekshiring
 
 
+
