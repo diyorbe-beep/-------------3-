@@ -136,34 +136,6 @@ function LandingPage({ onNavigate }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      // Agar email bo'lsa, mijozni topib telefon raqamini olish
-      let phoneToUse = formData.phone
-      let customerName = formData.name
-      
-      if (formData.email) {
-        try {
-          const customers = await customersAPI.getAll()
-          const customer = customers.find(c => c.email === formData.email)
-          if (customer) {
-            if (customer.phone) {
-              phoneToUse = customer.phone
-              console.log('Mijoz telefon raqami topildi:', phoneToUse)
-            }
-            if (customer.name) {
-              customerName = customer.name
-            }
-          }
-        } catch (error) {
-          console.log('Mijozni topishda xatolik (ehtimol email yo\'q):', error)
-        }
-      }
-
-      // Telefon raqam bo'lmasa, xatolik
-      if (!phoneToUse || phoneToUse.trim() === '') {
-        alert('Iltimos, telefon raqamingizni kiriting.')
-        return
-      }
-
       const productMap = {
         '10ml': '10 ml Probnik',
         '50ml': '50 ml EDP',
@@ -171,28 +143,19 @@ function LandingPage({ onNavigate }) {
       }
       
       const orderData = {
-        customer: customerName,
-        phone: phoneToUse,
-        email: formData.email || '',
+        customer: formData.name,
+        phone: formData.phone,
+        email: formData.email,
         product: productMap[formData.product] || formData.product,
         price: formData.product === '10ml' ? '45 000' : formData.product === '50ml' ? '299 000' : '499 000',
-        comment: formData.comment || '',
+        comment: formData.comment,
         status: 'Yangi',
         date: new Date().toISOString().split('T')[0] // Sana qo'shamiz
       }
       
-      console.log('📤 Buyurtma yuborilmoqda:', orderData)
-      console.log('📤 Buyurtma ma\'lumotlari:', JSON.stringify(orderData, null, 2))
-      
+      console.log('Buyurtma yuborilmoqda:', orderData)
       const result = await ordersAPI.create(orderData)
-      console.log('✅ Buyurtma yuborildi, javob:', result)
-      console.log('✅ Buyurtma ID:', result.id)
-      console.log('✅ Buyurtma status:', result.status)
-      
-      // Buyurtma yuborilgandan keyin, admin panelga xabar berish
-      if (result && result.id) {
-        console.log('✅ Buyurtma muvaffaqiyatli yaratildi va backend\'ga saqlandi!')
-      }
+      console.log('Buyurtma yuborildi, javob:', result)
       
       alert('Buyurtma qoldirdi! Tez orada siz bilan bog\'lanamiz.')
       setFormData({ name: '', email: '', phone: '', product: '', comment: '' })

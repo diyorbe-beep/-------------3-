@@ -181,18 +181,9 @@ function LandingPage({ onNavigate }) {
         date: new Date().toISOString().split('T')[0] // Sana qo'shamiz
       }
       
-      console.log('📤 Buyurtma yuborilmoqda:', orderData)
-      console.log('📤 Buyurtma ma\'lumotlari:', JSON.stringify(orderData, null, 2))
-      
+      console.log('Buyurtma yuborilmoqda:', orderData)
       const result = await ordersAPI.create(orderData)
-      console.log('✅ Buyurtma yuborildi, javob:', result)
-      console.log('✅ Buyurtma ID:', result.id)
-      console.log('✅ Buyurtma status:', result.status)
-      
-      // Buyurtma yuborilgandan keyin, admin panelga xabar berish
-      if (result && result.id) {
-        console.log('✅ Buyurtma muvaffaqiyatli yaratildi va backend\'ga saqlandi!')
-      }
+      console.log('Buyurtma yuborildi, javob:', result)
       
       alert('Buyurtma qoldirdi! Tez orada siz bilan bog\'lanamiz.')
       setFormData({ name: '', email: '', phone: '', product: '', comment: '' })

@@ -136,34 +136,6 @@ function LandingPage({ onNavigate }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      // Agar email bo'lsa, mijozni topib telefon raqamini olish
-      let phoneToUse = formData.phone
-      let customerName = formData.name
-      
-      if (formData.email) {
-        try {
-          const customers = await customersAPI.getAll()
-          const customer = customers.find(c => c.email === formData.email)
-          if (customer) {
-            if (customer.phone) {
-              phoneToUse = customer.phone
-              console.log('Mijoz telefon raqami topildi:', phoneToUse)
-            }
-            if (customer.name) {
-              customerName = customer.name
-            }
-          }
-        } catch (error) {
-          console.log('Mijozni topishda xatolik (ehtimol email yo\'q):', error)
-        }
-      }
-
-      // Telefon raqam bo'lmasa, xatolik
-      if (!phoneToUse || phoneToUse.trim() === '') {
-        alert('Iltimos, telefon raqamingizni kiriting.')
-        return
-      }
-
       const productMap = {
         '10ml': '10 ml Probnik',
         '50ml': '50 ml EDP',
@@ -171,28 +143,19 @@ function LandingPage({ onNavigate }) {
       }
       
       const orderData = {
-        customer: customerName,
-        phone: phoneToUse,
-        email: formData.email || '',
+        customer: formData.name,
+        phone: formData.phone,
+        email: formData.email,
         product: productMap[formData.product] || formData.product,
         price: formData.product === '10ml' ? '45 000' : formData.product === '50ml' ? '299 000' : '499 000',
-        comment: formData.comment || '',
+        comment: formData.comment,
         status: 'Yangi',
         date: new Date().toISOString().split('T')[0] // Sana qo'shamiz
       }
       
-      console.log('📤 Buyurtma yuborilmoqda:', orderData)
-      console.log('📤 Buyurtma ma\'lumotlari:', JSON.stringify(orderData, null, 2))
-      
+      console.log('Buyurtma yuborilmoqda:', orderData)
       const result = await ordersAPI.create(orderData)
-      console.log('✅ Buyurtma yuborildi, javob:', result)
-      console.log('✅ Buyurtma ID:', result.id)
-      console.log('✅ Buyurtma status:', result.status)
-      
-      // Buyurtma yuborilgandan keyin, admin panelga xabar berish
-      if (result && result.id) {
-        console.log('✅ Buyurtma muvaffaqiyatli yaratildi va backend\'ga saqlandi!')
-      }
+      console.log('Buyurtma yuborildi, javob:', result)
       
       alert('Buyurtma qoldirdi! Tez orada siz bilan bog\'lanamiz.')
       setFormData({ name: '', email: '', phone: '', product: '', comment: '' })
@@ -871,63 +834,6 @@ function LandingPage({ onNavigate }) {
           </div>
         </div>
       </section>
-
-      {/* Google orqali ro'yxatdan o'tganda telefon raqam so'rash modal */}
-      {showPhoneModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <h2 className="text-2xl font-bold text-[#111111] mb-4">Telefon raqamingizni kiriting</h2>
-            <p className="text-gray-700 mb-4">
-              Xush kelibsiz, <strong>{googleUserInfo?.name || googleUserInfo?.email}</strong>! 
-              Buyurtmalarni qabul qilish uchun telefon raqamingizni kiriting.
-            </p>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2 text-[#111111]">
-                Telefon raqamingiz <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="tel"
-                required
-                value={phoneForGoogle}
-                onChange={(e) => {
-                  let value = e.target.value.replace(/[^0-9+]/g, '')
-                  if (!value.startsWith('+') && value.startsWith('998')) {
-                    value = '+' + value
-                  }
-                  const cleanValue = value.startsWith('+') 
-                    ? '+' + value.slice(1).replace(/[^0-9]/g, '')
-                    : value.replace(/[^0-9]/g, '')
-                  setPhoneForGoogle(cleanValue)
-                }}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
-                placeholder="+998901234567"
-                maxLength="13"
-                autoFocus
-              />
-              <p className="text-xs text-gray-500 mt-1">Masalan: +998901234567</p>
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={handleSaveGooglePhone}
-                disabled={isLoading || !phoneForGoogle || !phoneForGoogle.startsWith('+998') || phoneForGoogle.length !== 13}
-                className="flex-1 bg-[#111111] text-white px-4 py-2 rounded-md hover:bg-gold transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? 'Saqlanmoqda...' : 'Saqlash'}
-              </button>
-              <button
-                onClick={() => {
-                  setShowPhoneModal(false)
-                  setPhoneForGoogle('')
-                  setGoogleUserInfo(null)
-                }}
-                className="flex-1 bg-gray-200 text-[#111111] px-4 py-2 rounded-md hover:bg-gray-300 transition-colors font-medium"
-              >
-                Bekor qilish
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Footer */}
       <footer className="bg-[#111111] text-white py-8 px-4">
