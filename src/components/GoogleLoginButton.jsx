@@ -7,7 +7,6 @@ export default function GoogleLoginButton({ onSuccess, onError }) {
     flow: 'implicit', // implicit flow ishlatamiz (browser-based)
     onSuccess: async (tokenResponse) => {
       try {
-        console.log('Google OAuth token olingan:', tokenResponse)
         
         // Google user info olish
         const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
@@ -21,7 +20,6 @@ export default function GoogleLoginButton({ onSuccess, onError }) {
         }
 
         const userInfo = await userInfoResponse.json()
-        console.log('Google user info:', userInfo)
         
         if (!userInfo.email) {
           alert('Email manzil topilmadi. Iltimos, qayta urinib ko\'ring.')
@@ -45,15 +43,12 @@ export default function GoogleLoginButton({ onSuccess, onError }) {
             profile: ''
           }
           
-          console.log('Mijoz yaratilmoqda:', customerData)
           const createdCustomer = await customersAPI.create(customerData)
-          console.log('Mijoz yaratildi:', createdCustomer)
         } catch (error) {
           // Agar mijoz allaqachon mavjud bo'lsa, bu xatolik emas
           if (error.message && error.message.includes('already exists')) {
-            console.log('Mijoz allaqachon mavjud')
+            // Mijoz allaqachon mavjud
           } else {
-            console.error('Mijoz yaratishda xatolik:', error)
             // Xatolik bo'lsa ham davom etamiz
           }
         }
@@ -65,7 +60,6 @@ export default function GoogleLoginButton({ onSuccess, onError }) {
           alert(`Xush kelibsiz, ${userInfo.name || userInfo.email}! Ro'yxatdan muvaffaqiyatli o'tdingiz.`)
         }
       } catch (error) {
-        console.error('Error fetching user info:', error)
         if (onError) {
           onError(error)
         } else {
@@ -74,7 +68,6 @@ export default function GoogleLoginButton({ onSuccess, onError }) {
       }
     },
     onError: (error) => {
-      console.error('Google login error:', error)
       if (onError) {
         onError(error)
       } else {

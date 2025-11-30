@@ -49,7 +49,6 @@ function DashboardPage() {
       })).sort((a, b) => b.percentage - a.percentage).slice(0, 4)
       setPopularProfiles(profiles)
     } catch (error) {
-      console.error('Error loading dashboard:', error)
     } finally {
       setLoading(false)
     }

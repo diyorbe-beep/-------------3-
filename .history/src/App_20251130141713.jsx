@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { ordersAPI, customersAPI } from './services/api'
 import './App.css'
 import Survey from './Survey.jsx'
@@ -28,7 +28,6 @@ function LandingPage({ onNavigate }) {
   const [showPhoneModal, setShowPhoneModal] = useState(false)
   const [googleUserInfo, setGoogleUserInfo] = useState(null)
   const [phoneForGoogle, setPhoneForGoogle] = useState('')
-  const hasNavigatedRef = useRef(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -40,13 +39,12 @@ function LandingPage({ onNavigate }) {
 
   // URL parametr orqali admin panelga kirish - faqat bir marta ishlaydi
   useEffect(() => {
-    if (hasNavigatedRef.current) return
-    
     const urlParams = new URLSearchParams(window.location.search)
     const isAdmin = urlParams.get('admin') === 'true' || urlParams.get('admin') === '1'
     
-    if (isAdmin) {
-      hasNavigatedRef.current = true
+    // Faqat bir marta ishlashini ta'minlash uchun ref ishlatamiz
+    if (isAdmin && !sessionStorage.getItem('adminNavigated')) {
+      sessionStorage.setItem('adminNavigated', 'true')
       onNavigate('admin')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -108,8 +106,11 @@ function LandingPage({ onNavigate }) {
           date: new Date().toISOString().split('T')[0]
         }
         
+        console.log('📤 Google orqali buyurtma yuborilmoqda:', orderData)
         const orderResult = await ordersAPI.create(orderData)
+        console.log('✅ Google orqali buyurtma yaratildi:', orderResult)
       } catch (orderError) {
+        console.error('❌ Google orqali buyurtma yaratishda xatolik:', orderError)
         // Buyurtma yaratilmagan bo'lsa ham davom etamiz
       }
       
@@ -119,6 +120,7 @@ function LandingPage({ onNavigate }) {
       setGoogleUserInfo(null)
       setShowSignUp(false)
     } catch (error) {
+      console.error('Error creating customer:', error)
       // Agar mijoz allaqachon mavjud bo'lsa, telefon raqamni yangilash
       if (error.message && error.message.includes('already exists')) {
         // Mijozni topib, telefon raqamni yangilash
@@ -142,11 +144,15 @@ function LandingPage({ onNavigate }) {
               date: new Date().toISOString().split('T')[0]
             }
             
+            console.log('📤 Google orqali buyurtma yuborilmoqda:', orderData)
             const orderResult = await ordersAPI.create(orderData)
+            console.log('✅ Google orqali buyurtma yaratildi:', orderResult)
           } catch (orderError) {
+            console.error('❌ Google orqali buyurtma yaratishda xatolik:', orderError)
             // Buyurtma yaratilmagan bo'lsa ham davom etamiz
           }
         } catch (updateError) {
+          console.error('Error updating customer phone:', updateError)
         }
         alert('Buyurtma qoldirildi! Tez orada siz bilan bog\'lanamiz.')
       } else {
@@ -162,6 +168,7 @@ function LandingPage({ onNavigate }) {
   }
 
   const handleGoogleLoginError = (error) => {
+    console.error('Google login error:', error)
     alert('Google orqali ro\'yxatdan o\'tishda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.')
   }
 
@@ -187,12 +194,14 @@ function LandingPage({ onNavigate }) {
           if (customer) {
             if (customer.phone) {
               phoneToUse = customer.phone
+              console.log('Mijoz telefon raqami topildi:', phoneToUse)
             }
             if (customer.name) {
               customerName = customer.name
             }
           }
         } catch (error) {
+          console.log('Mijozni topishda xatolik (ehtimol email yo\'q):', error)
         }
       }
 
@@ -219,15 +228,23 @@ function LandingPage({ onNavigate }) {
         date: new Date().toISOString().split('T')[0] // Sana qo'shamiz
       }
       
+      console.log('📤 Buyurtma yuborilmoqda:', orderData)
+      console.log('📤 Buyurtma ma\'lumotlari:', JSON.stringify(orderData, null, 2))
+      
       const result = await ordersAPI.create(orderData)
+      console.log('✅ Buyurtma yuborildi, javob:', result)
+      console.log('✅ Buyurtma ID:', result.id)
+      console.log('✅ Buyurtma status:', result.status)
       
       // Buyurtma yuborilgandan keyin, admin panelga xabar berish
       if (result && result.id) {
+        console.log('✅ Buyurtma muvaffaqiyatli yaratildi va backend\'ga saqlandi!')
       }
       
       alert('Buyurtma qoldirdi! Tez orada siz bilan bog\'lanamiz.')
       setFormData({ name: '', email: '', phone: '', product: '', comment: '' })
     } catch (error) {
+      console.error('Error submitting order:', error)
       alert('Buyurtma yuborishda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.')
     }
   }
@@ -259,6 +276,7 @@ function LandingPage({ onNavigate }) {
       setSignUpData({ name: '', phone: '', password: '' })
       setShowSignUp(false)
     } catch (error) {
+      console.error('Error creating customer:', error)
       alert('Ro\'yxatdan o\'tishda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.')
     } finally {
       setIsLoading(false)
@@ -982,18 +1000,16 @@ function LandingPage({ onNavigate }) {
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home')
-  const hasNavigatedRef = useRef(false)
 
   // URL orqali admin panelga kirish - faqat bir marta ishlaydi
   useEffect(() => {
-    if (hasNavigatedRef.current) return
-    
     const urlParams = new URLSearchParams(window.location.search)
     const isAdminParam = urlParams.get('admin') === 'true' || urlParams.get('admin') === '1'
     const isAdminHash = window.location.hash === '#admin'
     
-    if (isAdminParam || isAdminHash) {
-      hasNavigatedRef.current = true
+    // Faqat bir marta ishlashini ta'minlash
+    if ((isAdminParam || isAdminHash) && !sessionStorage.getItem('adminNavigatedFromApp')) {
+      sessionStorage.setItem('adminNavigatedFromApp', 'true')
       setCurrentPage('admin')
     }
   }, [])

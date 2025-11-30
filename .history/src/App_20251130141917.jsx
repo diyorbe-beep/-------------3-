@@ -119,6 +119,7 @@ function LandingPage({ onNavigate }) {
       setGoogleUserInfo(null)
       setShowSignUp(false)
     } catch (error) {
+      console.error('Error creating customer:', error)
       // Agar mijoz allaqachon mavjud bo'lsa, telefon raqamni yangilash
       if (error.message && error.message.includes('already exists')) {
         // Mijozni topib, telefon raqamni yangilash
@@ -187,12 +188,14 @@ function LandingPage({ onNavigate }) {
           if (customer) {
             if (customer.phone) {
               phoneToUse = customer.phone
+              console.log('Mijoz telefon raqami topildi:', phoneToUse)
             }
             if (customer.name) {
               customerName = customer.name
             }
           }
         } catch (error) {
+          console.log('Mijozni topishda xatolik (ehtimol email yo\'q):', error)
         }
       }
 
@@ -219,15 +222,23 @@ function LandingPage({ onNavigate }) {
         date: new Date().toISOString().split('T')[0] // Sana qo'shamiz
       }
       
+      console.log('📤 Buyurtma yuborilmoqda:', orderData)
+      console.log('📤 Buyurtma ma\'lumotlari:', JSON.stringify(orderData, null, 2))
+      
       const result = await ordersAPI.create(orderData)
+      console.log('✅ Buyurtma yuborildi, javob:', result)
+      console.log('✅ Buyurtma ID:', result.id)
+      console.log('✅ Buyurtma status:', result.status)
       
       // Buyurtma yuborilgandan keyin, admin panelga xabar berish
       if (result && result.id) {
+        console.log('✅ Buyurtma muvaffaqiyatli yaratildi va backend\'ga saqlandi!')
       }
       
       alert('Buyurtma qoldirdi! Tez orada siz bilan bog\'lanamiz.')
       setFormData({ name: '', email: '', phone: '', product: '', comment: '' })
     } catch (error) {
+      console.error('Error submitting order:', error)
       alert('Buyurtma yuborishda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.')
     }
   }
@@ -259,6 +270,7 @@ function LandingPage({ onNavigate }) {
       setSignUpData({ name: '', phone: '', password: '' })
       setShowSignUp(false)
     } catch (error) {
+      console.error('Error creating customer:', error)
       alert('Ro\'yxatdan o\'tishda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.')
     } finally {
       setIsLoading(false)

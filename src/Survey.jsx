@@ -74,7 +74,6 @@ function Survey({ onNavigate }) {
         phone: ''
       })
     } catch (error) {
-      console.error('Error submitting survey:', error)
       alert('Surovnoma yuborishda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.')
     }
   }

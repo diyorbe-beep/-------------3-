@@ -259,6 +259,7 @@ function LandingPage({ onNavigate }) {
       setSignUpData({ name: '', phone: '', password: '' })
       setShowSignUp(false)
     } catch (error) {
+      console.error('Error creating customer:', error)
       alert('Ro\'yxatdan o\'tishda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.')
     } finally {
       setIsLoading(false)

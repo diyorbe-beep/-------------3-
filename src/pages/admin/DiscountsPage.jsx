@@ -21,7 +21,6 @@ function DiscountsPage() {
       const data = await discountsAPI.getAll()
       setPromoCodes(data)
     } catch (error) {
-      console.error('Error loading discounts:', error)
       alert('Chegirmalarni yuklashda xatolik yuz berdi')
     } finally {
       setLoading(false)
@@ -41,7 +40,6 @@ function DiscountsPage() {
       setShowForm(false)
       alert('Promo kod muvaffaqiyatli qo\'shildi!')
     } catch (error) {
-      console.error('Error creating discount:', error)
       alert('Promo kod qo\'shishda xatolik yuz berdi')
     }
   }
@@ -52,7 +50,6 @@ function DiscountsPage() {
       const updated = await discountsAPI.update(id, { active: !discount.active })
       setPromoCodes(promoCodes.map(d => d.id === id ? updated : d))
     } catch (error) {
-      console.error('Error updating discount:', error)
       alert('Holatni yangilashda xatolik yuz berdi')
     }
   }
@@ -64,7 +61,6 @@ function DiscountsPage() {
         setPromoCodes(promoCodes.filter(d => d.id != id))
         alert('Promo kod o\'chirildi!')
       } catch (error) {
-        console.error('Error deleting discount:', error)
         alert('Promo kodni o\'chirishda xatolik yuz berdi')
       }
     }

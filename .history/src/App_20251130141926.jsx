@@ -119,6 +119,7 @@ function LandingPage({ onNavigate }) {
       setGoogleUserInfo(null)
       setShowSignUp(false)
     } catch (error) {
+      console.error('Error creating customer:', error)
       // Agar mijoz allaqachon mavjud bo'lsa, telefon raqamni yangilash
       if (error.message && error.message.includes('already exists')) {
         // Mijozni topib, telefon raqamni yangilash
@@ -228,6 +229,7 @@ function LandingPage({ onNavigate }) {
       alert('Buyurtma qoldirdi! Tez orada siz bilan bog\'lanamiz.')
       setFormData({ name: '', email: '', phone: '', product: '', comment: '' })
     } catch (error) {
+      console.error('Error submitting order:', error)
       alert('Buyurtma yuborishda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.')
     }
   }
@@ -259,6 +261,7 @@ function LandingPage({ onNavigate }) {
       setSignUpData({ name: '', phone: '', password: '' })
       setShowSignUp(false)
     } catch (error) {
+      console.error('Error creating customer:', error)
       alert('Ro\'yxatdan o\'tishda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.')
     } finally {
       setIsLoading(false)

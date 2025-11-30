@@ -24,7 +24,6 @@ function SettingsPage() {
       const data = await settingsAPI.get()
       setSettings(data)
     } catch (error) {
-      console.error('Error loading settings:', error)
     } finally {
       setLoading(false)
     }
@@ -41,7 +40,6 @@ function SettingsPage() {
       await settingsAPI.update(settings)
       alert('Sozlamalar saqlandi!')
     } catch (error) {
-      console.error('Error saving settings:', error)
       alert('Sozlamalarni saqlashda xatolik yuz berdi')
     } finally {
       setSaving(false)

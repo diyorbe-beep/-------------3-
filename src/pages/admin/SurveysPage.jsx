@@ -26,11 +26,9 @@ function SurveysPage() {
     try {
       setLoading(true)
       const data = await surveysAPI.getAll()
-      console.log('So\'rovlar yuklandi:', data)
       // Agar data array bo'lmasa, bo'sh array qaytaramiz
       setSurveys(Array.isArray(data) ? data : [])
     } catch (error) {
-      console.error('Error loading surveys:', error)
       setSurveys([])
       if (surveys.length === 0) {
         alert(`So'rovlarni yuklashda xatolik yuz berdi: ${error.message}`)
@@ -341,12 +339,10 @@ function SurveysPage() {
         }, 100)
       }
     } catch (error) {
-      console.error('PDF yuklab olishda xatolik:', error)
       // Fallback: oddiy save metodi
       try {
         doc.save(fileName)
       } catch (fallbackError) {
-        console.error('Fallback PDF yuklab olishda xatolik:', fallbackError)
         // Eng oxirgi fallback: data URI
         try {
           const pdfDataUri = doc.output('datauristring')
@@ -363,7 +359,6 @@ function SurveysPage() {
             }
           }, 100)
         } catch (finalError) {
-          console.error('Barcha PDF yuklab olish usullari muvaffaqiyatsiz:', finalError)
           alert('PDF yuklab olishda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring yoki boshqa brauzerda sinab ko\'ring.')
         }
       }

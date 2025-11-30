@@ -15,7 +15,6 @@ function FeedbackPage() {
       const data = await feedbackAPI.getAll()
       setFeedbacks(data)
     } catch (error) {
-      console.error('Error loading feedback:', error)
       alert('Feedback yuklashda xatolik yuz berdi')
     } finally {
       setLoading(false)

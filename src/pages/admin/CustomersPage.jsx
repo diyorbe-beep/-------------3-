@@ -16,7 +16,6 @@ function CustomersPage() {
       const data = await customersAPI.getAll()
       setCustomers(data)
     } catch (error) {
-      console.error('Error loading customers:', error)
       alert('Mijozlarni yuklashda xatolik yuz berdi')
     } finally {
       setLoading(false)

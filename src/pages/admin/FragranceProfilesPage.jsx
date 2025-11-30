@@ -21,7 +21,6 @@ function FragranceProfilesPage() {
       const data = await profilesAPI.getAll()
       setProfiles(data)
     } catch (error) {
-      console.error('Error loading profiles:', error)
       alert('Profillarni yuklashda xatolik yuz berdi')
     } finally {
       setLoading(false)
@@ -37,7 +36,6 @@ function FragranceProfilesPage() {
       setShowForm(false)
       alert('Profil muvaffaqiyatli qo\'shildi!')
     } catch (error) {
-      console.error('Error creating profile:', error)
       alert('Profil qo\'shishda xatolik yuz berdi')
     }
   }
@@ -49,7 +47,6 @@ function FragranceProfilesPage() {
         setProfiles(profiles.filter(p => p.id != id))
         alert('Profil o\'chirildi!')
       } catch (error) {
-        console.error('Error deleting profile:', error)
         alert('Profilni o\'chirishda xatolik yuz berdi')
       }
     }
