@@ -966,23 +966,26 @@ function LandingPage({ onNavigate }) {
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home')
+  const hasNavigatedRef = useRef(false)
   const urlCheckedRef = useRef(false)
 
-  // URL orqali admin panelga kirish - faqat bir marta ishlaydi
+  // URL orqali admin panelga kirish - faqat bir marta ishlaydi va faqat home page bo'lganda
   useEffect(() => {
-    // Agar allaqachon tekshirilgan bo'lsa, ishlamaydi
-    if (urlCheckedRef.current) return
-    
-    urlCheckedRef.current = true
+    // Agar allaqachon tekshirilgan bo'lsa yoki admin panelda bo'lsak, ishlamaydi
+    if (urlCheckedRef.current || currentPage === 'admin') return
     
     const urlParams = new URLSearchParams(window.location.search)
     const isAdminParam = urlParams.get('admin') === 'true' || urlParams.get('admin') === '1'
     const isAdminHash = window.location.hash === '#admin'
     
     if (isAdminParam || isAdminHash) {
+      urlCheckedRef.current = true
+      hasNavigatedRef.current = true
       setCurrentPage('admin')
+    } else {
+      urlCheckedRef.current = true
     }
-  }, [])
+  }, [currentPage])
 
   if (currentPage === 'survey') {
     return <Survey onNavigate={() => setCurrentPage('home')} />

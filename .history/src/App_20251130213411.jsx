@@ -39,8 +39,19 @@ function LandingPage({ onNavigate }) {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // LandingPage komponentida URL parametrlarini tekshirish kerak emas,
-  // chunki bu App komponentida boshqariladi
+  // URL parametr orqali admin panelga kirish - faqat bir marta ishlaydi
+  useEffect(() => {
+    if (hasNavigatedRef.current) return
+    
+    const urlParams = new URLSearchParams(window.location.search)
+    const isAdmin = urlParams.get('admin') === 'true' || urlParams.get('admin') === '1'
+    
+    if (isAdmin) {
+      hasNavigatedRef.current = true
+      onNavigate('admin')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // onNavigate ni dependency dan olib tashladik, chunki u stable funksiya
 
   // Logotipga 5 marta bosish orqali admin panelga kirish
   const handleLogoClick = () => {
@@ -966,20 +977,18 @@ function LandingPage({ onNavigate }) {
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home')
-  const urlCheckedRef = useRef(false)
+  const hasNavigatedRef = useRef(false)
 
   // URL orqali admin panelga kirish - faqat bir marta ishlaydi
   useEffect(() => {
-    // Agar allaqachon tekshirilgan bo'lsa, ishlamaydi
-    if (urlCheckedRef.current) return
-    
-    urlCheckedRef.current = true
+    if (hasNavigatedRef.current) return
     
     const urlParams = new URLSearchParams(window.location.search)
     const isAdminParam = urlParams.get('admin') === 'true' || urlParams.get('admin') === '1'
     const isAdminHash = window.location.hash === '#admin'
     
     if (isAdminParam || isAdminHash) {
+      hasNavigatedRef.current = true
       setCurrentPage('admin')
     }
   }, [])

@@ -28,3 +28,4 @@ export const PRICE_MAP = {
   '100ml': PRICES.EDP_100ML
 }
 
+
