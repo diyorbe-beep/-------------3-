@@ -575,7 +575,7 @@ function LandingPage({ onNavigate }) {
                 Premium
               </span>
               <h3 className="text-xl font-semibold mb-2 text-[#111111]">100 ml Eau de Parfum</h3>
-              <p className="text-4xl font-bold text-gold mb-2">{PRICES.EDP_100ML} so'm</p>
+              <p className="text-4xl font-bold text-gold mb-2">499 000 so'm</p>
               <p className="text-sm text-gray-600 mb-6">Oilaviy yoki uzoq muddat foydalanish uchun.</p>
               <button
                 onClick={() => scrollToSection('contact')}
@@ -631,7 +631,7 @@ function LandingPage({ onNavigate }) {
               },
               {
                 q: "Probnik yoqmasa nima bo'ladi?",
-                a: `Birinchi probnik yoqmasa, ikkinchi probnikni ${PRICES.PROBNIK_2ND} so'm evaziga boshqa yo'nalishda sinab ko'rishingiz mumkin.`
+                a: "Birinchi probnik yoqmasa, ikkinchi probnikni 35 000 so'm evaziga boshqa yo'nalishda sinab ko'rishingiz mumkin."
               },
               {
                 q: "Yetkazib berish bormi?",

@@ -3,13 +3,15 @@ import { settingsAPI } from '../../services/api'
 
 function SettingsPage() {
   const [settings, setSettings] = useState({
-    telegram: "",
-    instagram: "",
-    email: "",
-    phone: "",
-    probnikPrice: "",
-    price50ml: "",
-    price100ml: ""
+    siteName: '',
+    contactPhone: '',
+    contactEmail: '',
+    address: '',
+    socialMedia: {
+      instagram: '',
+      telegram: '',
+      facebook: ''
+    }
   })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -22,15 +24,23 @@ function SettingsPage() {
     try {
       setLoading(true)
       const data = await settingsAPI.get()
-      setSettings(data)
+      if (data) {
+        setSettings({
+          siteName: data.siteName || '',
+          contactPhone: data.contactPhone || '',
+          contactEmail: data.contactEmail || '',
+          address: data.address || '',
+          socialMedia: {
+            instagram: data.socialMedia?.instagram || '',
+            telegram: data.socialMedia?.telegram || '',
+            facebook: data.socialMedia?.facebook || ''
+          }
+        })
+      }
     } catch (error) {
     } finally {
       setLoading(false)
     }
-  }
-
-  const handleChange = (e) => {
-    setSettings({ ...settings, [e.target.name]: e.target.value })
   }
 
   const handleSubmit = async (e) => {
@@ -38,11 +48,29 @@ function SettingsPage() {
     try {
       setSaving(true)
       await settingsAPI.update(settings)
-      alert('Sozlamalar saqlandi!')
+      alert('Sozlamalar muvaffaqiyatli saqlandi!')
     } catch (error) {
       alert('Sozlamalarni saqlashda xatolik yuz berdi')
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleChange = (field, value) => {
+    if (field.startsWith('socialMedia.')) {
+      const socialField = field.split('.')[1]
+      setSettings(prev => ({
+        ...prev,
+        socialMedia: {
+          ...prev.socialMedia,
+          [socialField]: value
+        }
+      }))
+    } else {
+      setSettings(prev => ({
+        ...prev,
+        [field]: value
+      }))
     }
   }
 
@@ -55,111 +83,114 @@ function SettingsPage() {
   }
 
   return (
-    <div className="space-y-4 lg:space-y-6">
-      <h1 className="text-2xl lg:text-3xl font-bold text-[#111111]">Sozlamalar</h1>
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold text-[#111111]">Sozlamalar</h1>
 
-      <div className="bg-white rounded-lg shadow-sm p-4 lg:p-6">
-        <form onSubmit={handleSubmit} className="space-y-4 lg:space-y-6">
-          <h2 className="text-lg lg:text-xl font-semibold text-[#111111] mb-4">Kontakt ma'lumotlari</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 lg:gap-4">
+      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm p-6 space-y-6">
+        <div>
+          <label className="block text-sm font-medium mb-2 text-[#111111]">
+            Sayt nomi
+          </label>
+          <input
+            type="text"
+            value={settings.siteName}
+            onChange={(e) => handleChange('siteName', e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold"
+            placeholder="HIDIM"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2 text-[#111111]">
+            Kontakt telefon
+          </label>
+          <input
+            type="tel"
+            value={settings.contactPhone}
+            onChange={(e) => handleChange('contactPhone', e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold"
+            placeholder="+998901234567"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2 text-[#111111]">
+            Kontakt email
+          </label>
+          <input
+            type="email"
+            value={settings.contactEmail}
+            onChange={(e) => handleChange('contactEmail', e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold"
+            placeholder="info@hidim.uz"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2 text-[#111111]">
+            Manzil
+          </label>
+          <textarea
+            value={settings.address}
+            onChange={(e) => handleChange('address', e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold"
+            rows="3"
+            placeholder="Manzil..."
+          />
+        </div>
+
+        <div className="border-t border-gray-200 pt-6">
+          <h2 className="text-lg font-semibold text-[#111111] mb-4">Ijtimoiy tarmoqlar</h2>
+          <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Telegram username</label>
+              <label className="block text-sm font-medium mb-2 text-[#111111]">
+                Instagram
+              </label>
               <input
                 type="text"
-                name="telegram"
-                value={settings.telegram}
-                onChange={handleChange}
+                value={settings.socialMedia.instagram}
+                onChange={(e) => handleChange('socialMedia.instagram', e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold"
                 placeholder="@hidim_parfum"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Instagram</label>
+              <label className="block text-sm font-medium mb-2 text-[#111111]">
+                Telegram
+              </label>
               <input
                 type="text"
-                name="instagram"
-                value={settings.instagram}
-                onChange={handleChange}
+                value={settings.socialMedia.telegram}
+                onChange={(e) => handleChange('socialMedia.telegram', e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold"
-                placeholder="@hidim.official"
+                placeholder="@hidim_parfum"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+              <label className="block text-sm font-medium mb-2 text-[#111111]">
+                Facebook
+              </label>
               <input
-                type="email"
-                name="email"
-                value={settings.email}
-                onChange={handleChange}
+                type="text"
+                value={settings.socialMedia.facebook}
+                onChange={(e) => handleChange('socialMedia.facebook', e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold"
-                placeholder="info@hidim.uz"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Asosiy telefon raqami</label>
-              <input
-                type="tel"
-                name="phone"
-                value={settings.phone}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold"
-                placeholder="+998901234567"
+                placeholder="hidim.parfum"
               />
             </div>
           </div>
+        </div>
 
-          <div className="border-t border-gray-200 pt-6 mt-6">
-            <h2 className="text-xl font-semibold text-[#111111] mb-4">Narxlar</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Probnik narxi (so'm)</label>
-                <input
-                  type="number"
-                  name="probnikPrice"
-                  value={settings.probnikPrice}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold"
-                  placeholder="45000"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">50 ml narxi (so'm)</label>
-                <input
-                  type="number"
-                  name="price50ml"
-                  value={settings.price50ml}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold"
-                  placeholder="299000"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">100 ml narxi (so'm)</label>
-                <input
-                  type="number"
-                  name="price100ml"
-                  value={settings.price100ml}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold"
-                  placeholder="499000"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-end pt-4">
-            <button
-              type="submit"
-              disabled={saving}
-              className="px-8 py-3 bg-[#111111] text-white rounded-lg hover:bg-gold transition-colors font-medium disabled:opacity-50"
-            >
-              {saving ? 'Saqlanmoqda...' : 'Saqlash'}
-            </button>
-          </div>
-        </form>
-      </div>
+        <div className="flex justify-end pt-4">
+          <button
+            type="submit"
+            disabled={saving}
+            className="px-6 py-2 bg-[#111111] text-white rounded-lg hover:bg-gold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {saving ? 'Saqlanmoqda...' : 'Saqlash'}
+          </button>
+        </div>
+      </form>
     </div>
   )
 }

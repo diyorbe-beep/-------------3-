@@ -13,9 +13,9 @@ function FeedbackPage() {
     try {
       setLoading(true)
       const data = await feedbackAPI.getAll()
-      setFeedbacks(data)
+      setFeedbacks(Array.isArray(data) ? data : [])
     } catch (error) {
-      alert('Feedback yuklashda xatolik yuz berdi')
+      setFeedbacks([])
     } finally {
       setLoading(false)
     }

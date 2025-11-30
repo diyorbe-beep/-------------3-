@@ -631,7 +631,7 @@ function LandingPage({ onNavigate }) {
               },
               {
                 q: "Probnik yoqmasa nima bo'ladi?",
-                a: `Birinchi probnik yoqmasa, ikkinchi probnikni ${PRICES.PROBNIK_2ND} so'm evaziga boshqa yo'nalishda sinab ko'rishingiz mumkin.`
+                a: "Birinchi probnik yoqmasa, ikkinchi probnikni 35 000 so'm evaziga boshqa yo'nalishda sinab ko'rishingiz mumkin."
               },
               {
                 q: "Yetkazib berish bormi?",

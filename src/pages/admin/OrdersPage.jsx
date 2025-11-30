@@ -24,14 +24,53 @@ function OrdersPage() {
   const loadOrders = async () => {
     try {
       setLoading(true)
+      console.log('🔄 Buyurtmalar yuklanmoqda...')
+      console.log('🌐 Backend URL: https://atir.onrender.com/api/orders')
+      
       const data = await ordersAPI.getAll()
+      console.log('✅ Buyurtmalar yuklandi:', data)
+      console.log('📊 Buyurtmalar soni:', Array.isArray(data) ? data.length : 0)
       
       // Agar data array bo'lmasa, bo'sh array qaytaramiz
       const ordersArray = Array.isArray(data) ? data : []
       setOrders(ordersArray)
+      
+      if (ordersArray.length === 0) {
+        console.warn('⚠️ Buyurtmalar topilmadi. Backend\'dan bo\'sh array qaytdi.')
+        console.warn('⚠️ Backend URL:', 'https://atir.onrender.com/api/orders')
+        console.warn('⚠️ Tekshirish: Backend server ishlayaptimi?')
+        console.warn('⚠️ Yechim: Backend serverni tekshiring yoki local backend\'ni ishga tushiring')
+        
+        // Backend server ishlayaptimi tekshirish
+        try {
+          const healthCheck = await fetch('https://atir.onrender.com/api/health')
+          if (healthCheck.ok) {
+            const health = await healthCheck.json()
+            console.log('✅ Backend server ishlayapti:', health)
+          } else {
+            console.error('❌ Backend server javob bermayapti')
+          }
+        } catch (healthError) {
+          console.error('❌ Backend serverga ulanishda xatolik:', healthError)
+          console.error('❌ Ehtimol, backend server ishlamayapti yoki internet muammosi bor')
+        }
+      } else {
+        console.log('✅ Buyurtmalar muvaffaqiyatli yuklandi!')
+        console.log('✅ Birinchi buyurtma:', ordersArray[0])
+      }
     } catch (error) {
+      console.error('❌ Error loading orders:', error)
+      console.error('❌ Error details:', error.message)
+      console.error('❌ Error stack:', error.stack)
+      console.error('❌ Backend serverga ulanishda muammo bo\'lishi mumkin')
+      
       // Xatolik bo'lsa ham bo'sh array qo'yamiz
       setOrders([])
+      
+      // Faqat birinchi marta xatolik bo'lsa alert ko'rsatamiz
+      if (orders.length === 0) {
+        console.error('❌ Buyurtmalarni yuklashda xatolik. Backend server ishlayaptimi?')
+      }
     } finally {
       setLoading(false)
     }
@@ -56,6 +95,7 @@ function OrdersPage() {
       setSelectedOrder({ ...selectedOrder, status: newStatus })
       alert('Holat yangilandi!')
     } catch (error) {
+      console.error('Error updating order:', error)
       alert('Holatni yangilashda xatolik yuz berdi')
     }
   }
@@ -79,11 +119,11 @@ function OrdersPage() {
   }
 
   return (
-    <div className="space-y-4 lg:space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-[#111111]">Buyurtmalar</h1>
-          <p className="text-xs lg:text-sm text-gray-500 mt-1">
+          <h1 className="text-3xl font-bold text-[#111111]">Buyurtmalar</h1>
+          <p className="text-sm text-gray-500 mt-1">
             Jami: {orders.length} ta buyurtma
             {filteredOrders.length !== orders.length && ` (${filteredOrders.length} ta ko'rsatilmoqda)`}
           </p>
@@ -95,16 +135,16 @@ function OrdersPage() {
         </div>
         <button
           onClick={loadOrders}
-          className="px-4 py-2 bg-gold text-white rounded-lg hover:bg-brown transition-colors font-medium text-sm lg:text-base whitespace-nowrap"
+          className="px-4 py-2 bg-gold text-white rounded-lg hover:bg-brown transition-colors font-medium"
         >
           🔄 Yangilash
         </button>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow-sm p-4 lg:p-6">
-        <h2 className="text-base lg:text-lg font-semibold text-[#111111] mb-4">Filtrlar</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 lg:gap-4">
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-[#111111] mb-4">Filtrlar</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Holat</label>
             <select
@@ -143,69 +183,7 @@ function OrdersPage() {
 
       {/* Orders Table */}
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-        {/* Mobile Card View */}
-        <div className="lg:hidden divide-y divide-gray-200">
-          {filteredOrders.length > 0 ? (
-            filteredOrders.map((order) => (
-              <div key={order.id} className="p-4 space-y-2 hover:bg-cream/50">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <p className="text-xs text-gray-500">ID</p>
-                    <p className="text-sm font-medium text-gray-900 truncate">{String(order.id).substring(0, 12)}...</p>
-                  </div>
-                  <span className={`inline-block px-2 py-1 text-xs rounded-full ${getStatusBadge(order.status)} whitespace-nowrap ml-2`}>
-                    {order.status}
-                  </span>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Mijoz</p>
-                  <p className="text-sm font-medium text-gray-900">{order.customer}</p>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <p className="text-xs text-gray-500">Telefon</p>
-                    <p className="text-sm text-gray-900">{order.phone}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Sana</p>
-                    <p className="text-sm text-gray-900">{order.date}</p>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Mahsulot</p>
-                  <p className="text-sm text-gray-900">{order.product}</p>
-                </div>
-                <div className="flex justify-between items-center pt-2">
-                  <div>
-                    <p className="text-xs text-gray-500">Narx</p>
-                    <p className="text-sm font-semibold text-gray-900">{order.price}</p>
-                  </div>
-                  <button
-                    onClick={() => setSelectedOrder(order)}
-                    className="px-3 py-1.5 bg-gold text-white rounded-lg hover:bg-brown text-sm font-medium"
-                  >
-                    Ko'rish
-                  </button>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="py-8 text-center">
-              <div className="flex flex-col items-center gap-2">
-                <p className="text-gray-500 text-base">Buyurtmalar topilmadi</p>
-                {orders.length === 0 && (
-                  <p className="text-gray-400 text-xs">Hozircha hech qanday buyurtma qoldirilmagan</p>
-                )}
-                {orders.length > 0 && filteredOrders.length === 0 && (
-                  <p className="text-gray-400 text-xs">Filtrlar bo'yicha buyurtmalar topilmadi</p>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Desktop Table View */}
-        <div className="hidden lg:block overflow-x-auto">
+        <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
@@ -270,12 +248,12 @@ function OrdersPage() {
       {selectedOrder && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-4 lg:p-6">
-              <div className="flex items-center justify-between mb-4 lg:mb-6">
-                <h2 className="text-xl lg:text-2xl font-bold text-[#111111]">Buyurtma ma'lumotlari</h2>
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-[#111111]">Buyurtma ma'lumotlari</h2>
                 <button
                   onClick={() => setSelectedOrder(null)}
-                  className="text-gray-400 hover:text-gray-600 text-2xl lg:text-3xl"
+                  className="text-gray-400 hover:text-gray-600 text-2xl"
                 >
                   ×
                 </button>

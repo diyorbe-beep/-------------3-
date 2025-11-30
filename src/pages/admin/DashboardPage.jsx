@@ -64,8 +64,8 @@ function DashboardPage() {
   const displayStats = [
     { label: "Bugungi buyurtmalar", value: stats.todayOrders, color: "bg-blue-100 text-blue-700" },
     { label: "Bugungi probniklar", value: stats.todayProbniks, color: "bg-green-100 text-green-700" },
-    { label: "Bugungi flakonlar (50/100 ml)", value: stats.todayFlakons, color: "bg-purple-100 text-purple-700" },
-    { label: "Umumiy tushum (so'm)", value: formatPrice(stats.totalRevenue), color: "bg-gold/20 text-gold" },
+    { label: "Bugungi flakonlar", value: stats.todayFlakons, color: "bg-purple-100 text-purple-700" },
+    { label: "Jami daromad", value: `${formatPrice(stats.totalRevenue)} so'm`, color: "bg-gold text-white" },
   ]
 
   if (loading) {
@@ -77,118 +77,67 @@ function DashboardPage() {
   }
 
   return (
-    <div className="space-y-4 lg:space-y-6">
-      <h1 className="text-2xl lg:text-3xl font-bold text-[#111111]">Dashboard</h1>
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold text-[#111111]">Dashboard</h1>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {displayStats.map((stat, index) => (
-          <div key={index} className="bg-white rounded-lg shadow-sm p-4 lg:p-6">
-            <p className="text-xs lg:text-sm text-gray-600 mb-2">{stat.label}</p>
-            <p className={`text-xl lg:text-2xl font-bold ${stat.color}`}>{stat.value}</p>
+          <div key={index} className={`${stat.color} rounded-lg p-6 shadow-sm`}>
+            <p className="text-sm font-medium opacity-90 mb-1">{stat.label}</p>
+            <p className="text-2xl font-bold">{stat.value}</p>
           </div>
         ))}
       </div>
 
-      {/* Two Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+      {/* Recent Orders & Popular Profiles */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Orders */}
-        <div className="bg-white rounded-lg shadow-sm p-4 lg:p-6">
-          <h2 className="text-lg lg:text-xl font-semibold text-[#111111] mb-4">Oxirgi 5 ta buyurtma</h2>
-          <div className="overflow-x-auto -mx-4 lg:mx-0">
-            <div className="min-w-full px-4 lg:px-0">
-              {/* Mobile Card View */}
-              <div className="lg:hidden space-y-3">
-                {recentOrders.length > 0 ? (
-                  recentOrders.map((order) => (
-                    <div key={order.id} className="border border-gray-200 rounded-lg p-3 space-y-2">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <p className="text-xs text-gray-500">ID</p>
-                          <p className="text-sm font-medium text-gray-900 truncate">{String(order.id).substring(0, 8)}...</p>
-                        </div>
-                        <span className="inline-block px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700 whitespace-nowrap">
-                          {order.status}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500">Mijoz</p>
-                        <p className="text-sm text-gray-900">{order.customer}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500">Mahsulot</p>
-                        <p className="text-sm text-gray-900">{order.product}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500">Narx</p>
-                        <p className="text-sm font-semibold text-gray-900">{order.price}</p>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-center text-gray-500 py-4">Buyurtmalar yo'q</p>
-                )}
-              </div>
-              {/* Desktop Table View */}
-              <table className="hidden lg:table w-full">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-2 text-sm font-semibold text-gray-700">ID</th>
-                    <th className="text-left py-3 px-2 text-sm font-semibold text-gray-700">Mijoz</th>
-                    <th className="text-left py-3 px-2 text-sm font-semibold text-gray-700">Mahsulot</th>
-                    <th className="text-left py-3 px-2 text-sm font-semibold text-gray-700">Narx</th>
-                    <th className="text-left py-3 px-2 text-sm font-semibold text-gray-700">Holat</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentOrders.length > 0 ? (
-                    recentOrders.map((order) => (
-                      <tr key={order.id} className="border-b border-gray-100 hover:bg-cream/50">
-                        <td className="py-3 px-2 text-sm text-gray-700">{order.id}</td>
-                        <td className="py-3 px-2 text-sm text-gray-700">{order.customer}</td>
-                        <td className="py-3 px-2 text-sm text-gray-700">{order.product}</td>
-                        <td className="py-3 px-2 text-sm text-gray-700">{order.price}</td>
-                        <td className="py-3 px-2">
-                          <span className="inline-block px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">
-                            {order.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="5" className="py-4 text-center text-gray-500">Buyurtmalar yo'q</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-xl font-semibold text-[#111111] mb-4">So'nggi buyurtmalar</h2>
+          {recentOrders.length > 0 ? (
+            <div className="space-y-3">
+              {recentOrders.map((order) => (
+                <div key={order.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-[#111111]">{order.name}</p>
+                    <p className="text-sm text-gray-600">{order.product}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-[#111111]">{order.price}</p>
+                    <p className="text-xs text-gray-500">{order.date || order.createdAt}</p>
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
+          ) : (
+            <p className="text-gray-500 text-center py-4">Buyurtmalar topilmadi</p>
+          )}
         </div>
 
         {/* Popular Profiles */}
-        <div className="bg-white rounded-lg shadow-sm p-4 lg:p-6">
-          <h2 className="text-lg lg:text-xl font-semibold text-[#111111] mb-4">Eng ko'p tanlangan hid yo'nalishlari</h2>
-          <div className="space-y-4">
-            {popularProfiles.length > 0 ? (
-              popularProfiles.map((profile, index) => (
-                <div key={index}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700">{profile.name}</span>
-                    <span className="text-sm font-semibold text-gold">{profile.percentage}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-gold h-2 rounded-full transition-all"
-                      style={{ width: `${profile.percentage}%` }}
-                    ></div>
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-xl font-semibold text-[#111111] mb-4">Mashhur profillar</h2>
+          {popularProfiles.length > 0 ? (
+            <div className="space-y-3">
+              {popularProfiles.map((profile, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <span className="text-gray-700">{profile.name}</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-32 bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-gold h-2 rounded-full" 
+                        style={{ width: `${profile.percentage}%` }}
+                      />
+                    </div>
+                    <span className="text-sm font-medium text-gray-700 w-12 text-right">{profile.percentage}%</span>
                   </div>
                 </div>
-              ))
-            ) : (
-              <p className="text-gray-500 text-center">Ma'lumotlar yo'q</p>
-            )}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500 text-center py-4">Ma'lumotlar topilmadi</p>
+          )}
         </div>
       </div>
     </div>

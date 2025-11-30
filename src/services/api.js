@@ -13,9 +13,13 @@ if (API_BASE_URL.endsWith('/api/')) {
   API_BASE_URL = API_BASE_URL.slice(0, -5)
 }
 
+// Debug: API URL ni console ga chiqarish
+console.log('🔗 API Base URL:', API_BASE_URL)
+
 // Helper function for API calls
 const apiCall = async (endpoint, options = {}) => {
   const fullUrl = `${API_BASE_URL}${endpoint}`
+  console.log(`🌐 API So'rovi: ${options.method || 'GET'} ${fullUrl}`)
   
   try {
     const response = await fetch(fullUrl, {
@@ -26,14 +30,26 @@ const apiCall = async (endpoint, options = {}) => {
       ...options,
     })
     
+    console.log(`📥 API Javob: ${response.status} ${response.statusText}`)
+    
     if (!response.ok) {
       const errorText = await response.text()
+      console.error(`❌ API Error (${response.status}):`, errorText)
+      console.error(`❌ Full URL: ${fullUrl}`)
+      console.error(`❌ Request options:`, options)
       throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`)
     }
     
     const data = await response.json()
+    console.log(`✅ API Success:`, data)
     return data
   } catch (error) {
+    console.error('❌ API Error Details:', {
+      endpoint: fullUrl,
+      method: options.method || 'GET',
+      error: error.message,
+      stack: error.stack
+    })
     throw error
   }
 }
@@ -41,11 +57,17 @@ const apiCall = async (endpoint, options = {}) => {
 // Orders API
 export const ordersAPI = {
   getAll: async () => {
-    return await apiCall('/api/orders')
+    console.log('📡 GET /api/orders so\'rovi yuborilmoqda...')
+    const result = await apiCall('/api/orders')
+    console.log('📦 GET /api/orders javobi:', result)
+    return result
   },
   getById: (id) => apiCall(`/api/orders/${id}`),
   create: async (data) => {
-    return await apiCall('/api/orders', { method: 'POST', body: JSON.stringify(data) })
+    console.log('📡 POST /api/orders so\'rovi yuborilmoqda:', data)
+    const result = await apiCall('/api/orders', { method: 'POST', body: JSON.stringify(data) })
+    console.log('📦 POST /api/orders javobi:', result)
+    return result
   },
   update: (id, data) => apiCall(`/api/orders/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   delete: (id) => apiCall(`/api/orders/${id}`, { method: 'DELETE' }),
@@ -54,7 +76,10 @@ export const ordersAPI = {
 // Customers API
 export const customersAPI = {
   getAll: async () => {
-    return await apiCall('/api/customers')
+    console.log('📡 GET /api/customers so\'rovi yuborilmoqda...')
+    const result = await apiCall('/api/customers')
+    console.log('📦 GET /api/customers javobi:', result)
+    return result
   },
   create: (data) => apiCall('/api/customers', { method: 'POST', body: JSON.stringify(data) }),
   update: (id, data) => apiCall(`/api/customers/${id}`, { method: 'PUT', body: JSON.stringify(data) }),

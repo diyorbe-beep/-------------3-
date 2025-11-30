@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react'
 import { discountsAPI } from '../../services/api'
 
 function DiscountsPage() {
-  const [promoCodes, setPromoCodes] = useState([])
-  const [showForm, setShowForm] = useState(false)
+  const [discounts, setDiscounts] = useState([])
   const [loading, setLoading] = useState(true)
+  const [showForm, setShowForm] = useState(false)
   const [formData, setFormData] = useState({
     code: '',
     discount: '',
@@ -19,9 +19,9 @@ function DiscountsPage() {
     try {
       setLoading(true)
       const data = await discountsAPI.getAll()
-      setPromoCodes(data)
+      setDiscounts(Array.isArray(data) ? data : [])
     } catch (error) {
-      alert('Chegirmalarni yuklashda xatolik yuz berdi')
+      setDiscounts([])
     } finally {
       setLoading(false)
     }
@@ -30,39 +30,13 @@ function DiscountsPage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const newDiscount = await discountsAPI.create({
-        ...formData,
-        discount: parseInt(formData.discount),
-        active: true
-      })
-      setPromoCodes([...promoCodes, newDiscount])
-      setFormData({ code: '', discount: '', description: '' })
+      await discountsAPI.create(formData)
       setShowForm(false)
+      setFormData({ code: '', discount: '', description: '' })
+      loadDiscounts()
       alert('Promo kod muvaffaqiyatli qo\'shildi!')
     } catch (error) {
       alert('Promo kod qo\'shishda xatolik yuz berdi')
-    }
-  }
-
-  const toggleActive = async (id) => {
-    try {
-      const discount = promoCodes.find(d => d.id === id)
-      const updated = await discountsAPI.update(id, { active: !discount.active })
-      setPromoCodes(promoCodes.map(d => d.id === id ? updated : d))
-    } catch (error) {
-      alert('Holatni yangilashda xatolik yuz berdi')
-    }
-  }
-
-  const handleDelete = async (id) => {
-    if (window.confirm('Bu promo kodni o\'chirishni xohlaysizmi?')) {
-      try {
-        await discountsAPI.delete(id)
-        setPromoCodes(promoCodes.filter(d => d.id != id))
-        alert('Promo kod o\'chirildi!')
-      } catch (error) {
-        alert('Promo kodni o\'chirishda xatolik yuz berdi')
-      }
     }
   }
 
@@ -75,60 +49,62 @@ function DiscountsPage() {
   }
 
   return (
-    <div className="space-y-4 lg:space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <h1 className="text-2xl lg:text-3xl font-bold text-[#111111]">Chegirmalar</h1>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold text-[#111111]">Chegirmalar</h1>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="px-4 lg:px-6 py-2 bg-[#111111] text-white rounded-lg hover:bg-gold transition-colors text-sm lg:text-base whitespace-nowrap"
+          className="px-4 py-2 bg-gold text-white rounded-lg hover:bg-brown transition-colors"
         >
-          {showForm ? 'Bekor qilish' : 'Yangi promo kod qo\'shish'}
+          {showForm ? 'Bekor qilish' : 'Yangi promo kod'}
         </button>
       </div>
 
-      {/* Add Promo Code Form */}
       {showForm && (
-        <div className="bg-white rounded-lg shadow-sm p-4 lg:p-6">
-          <h2 className="text-lg lg:text-xl font-semibold text-[#111111] mb-4">Yangi promo kod</h2>
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-xl font-semibold text-[#111111] mb-4">Yangi promo kod qo'shish</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Promo kod nomi</label>
+              <label className="block text-sm font-medium mb-2 text-[#111111]">
+                Promo kod <span className="text-red-500">*</span>
+              </label>
               <input
                 type="text"
                 required
                 value={formData.code}
                 onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold"
-                placeholder="Masalan: VIDEO10"
+                placeholder="Masalan: WELCOME10"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Chegirma foizi</label>
-              <input
-                type="number"
-                required
-                min="1"
-                max="100"
-                value={formData.discount}
-                onChange={(e) => setFormData({ ...formData, discount: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold"
-                placeholder="Masalan: 10"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Izoh</label>
+              <label className="block text-sm font-medium mb-2 text-[#111111]">
+                Chegirma <span className="text-red-500">*</span>
+              </label>
               <input
                 type="text"
                 required
+                value={formData.discount}
+                onChange={(e) => setFormData({ ...formData, discount: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold"
+                placeholder="Masalan: 10% yoki 50000 so'm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2 text-[#111111]">
+                Tavsif
+              </label>
+              <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold"
-                placeholder="Masalan: Video fikr uchun"
+                rows="3"
+                placeholder="Promo kod tavsifi..."
               />
             </div>
             <button
               type="submit"
-              className="px-6 py-2 bg-[#111111] text-white rounded-lg hover:bg-gold transition-colors"
+              className="w-full bg-[#111111] text-white px-4 py-2 rounded-lg hover:bg-gold transition-colors"
             >
               Qo'shish
             </button>
@@ -136,105 +112,70 @@ function DiscountsPage() {
         </div>
       )}
 
-      {/* Promo Codes Table */}
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-        {/* Mobile Card View */}
-        <div className="lg:hidden divide-y divide-gray-200">
-          {promoCodes.length > 0 ? (
-            promoCodes.map((promo) => (
-              <div key={promo.id} className="p-4 space-y-2 hover:bg-cream/50">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <p className="text-xs text-gray-500">Promo kod</p>
-                    <p className="text-sm font-mono font-semibold text-gray-900">{promo.code}</p>
-                  </div>
-                  <span className={`inline-block px-2 py-1 text-xs rounded-full ${
-                    promo.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                  } whitespace-nowrap ml-2`}>
-                    {promo.active ? 'Aktiv' : 'Noaktiv'}
-                  </span>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Chegirma foizi</p>
-                  <p className="text-sm font-semibold text-gray-900">{promo.discount}%</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Izoh</p>
-                  <p className="text-sm text-gray-900">{promo.description}</p>
-                </div>
-                <div className="flex gap-2 pt-2">
-                  <button
-                    onClick={() => toggleActive(promo.id)}
-                    className="flex-1 px-3 py-1.5 bg-gold text-white rounded-lg hover:bg-brown text-sm font-medium"
-                  >
-                    {promo.active ? 'Noaktiv' : 'Aktiv'}
-                  </button>
-                  <button
-                    onClick={() => handleDelete(promo.id)}
-                    className="flex-1 px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-700 text-sm font-medium"
-                  >
-                    O'chirish
-                  </button>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="py-8 text-center text-gray-500">Promo kodlar topilmadi</div>
-          )}
-        </div>
-
-        {/* Desktop Table View */}
-        <div className="hidden lg:block overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Promo kod</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Chegirma foizi</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Izoh</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Holati</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Amallar</th>
-              </tr>
-            </thead>
-            <tbody>
-              {promoCodes.length > 0 ? (
-                promoCodes.map((promo) => (
-                  <tr key={promo.id} className="border-b border-gray-100 hover:bg-cream/50">
-                    <td className="py-3 px-4 text-sm text-gray-700 font-mono font-semibold">{promo.code}</td>
-                    <td className="py-3 px-4 text-sm text-gray-700">{promo.discount}%</td>
-                    <td className="py-3 px-4 text-sm text-gray-700">{promo.description}</td>
-                    <td className="py-3 px-4">
-                      <span className={`inline-block px-2 py-1 text-xs rounded-full ${
-                        promo.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                      }`}>
-                        {promo.active ? 'Aktiv' : 'Noaktiv'}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => toggleActive(promo.id)}
-                          className="text-gold hover:text-brown text-sm font-medium"
-                        >
-                          {promo.active ? 'Noaktiv qilish' : 'Aktiv qilish'}
-                        </button>
-                        <button
-                          onClick={() => handleDelete(promo.id)}
-                          className="text-red-500 hover:text-red-700 text-sm font-medium"
-                        >
-                          O'chirish
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5" className="py-4 text-center text-gray-500">Promo kodlar topilmadi</td>
+      {/* Desktop Table */}
+      <div className="hidden md:block bg-white rounded-lg shadow-sm overflow-hidden">
+        <table className="w-full">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Promo kod</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Chegirma</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tavsif</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {discounts.length > 0 ? (
+              discounts.map((discount) => (
+                <tr key={discount.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#111111]">
+                    {discount.code}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                    {discount.discount}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-700">
+                    {discount.description || '-'}
+                  </td>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="3" className="px-6 py-8 text-center text-gray-500">
+                  Promo kodlar topilmadi
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile Cards */}
+      <div className="md:hidden space-y-4">
+        {discounts.length > 0 ? (
+          discounts.map((discount) => (
+            <div key={discount.id} className="bg-white rounded-lg shadow-sm p-4">
+              <div className="space-y-2">
+                <div>
+                  <p className="text-xs text-gray-500">Promo kod</p>
+                  <p className="text-sm font-medium text-[#111111]">{discount.code}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Chegirma</p>
+                  <p className="text-sm text-gray-700">{discount.discount}</p>
+                </div>
+                {discount.description && (
+                  <div>
+                    <p className="text-xs text-gray-500">Tavsif</p>
+                    <p className="text-sm text-gray-700">{discount.description}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
+            Promo kodlar topilmadi
+          </div>
+        )}
       </div>
     </div>
   )

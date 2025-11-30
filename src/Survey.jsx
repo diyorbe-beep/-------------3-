@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { surveysAPI } from './services/api'
+import CustomDatePicker from './components/CustomDatePicker'
 import './App.css'
 
 function Survey({ onNavigate }) {
@@ -57,6 +58,13 @@ function Survey({ onNavigate }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    
+    // Required validation
+    if (!formData.birthDate) {
+      alert('Iltimos, tug\'ilgan sanangizni kiriting.')
+      return
+    }
+    
     try {
       await surveysAPI.create(formData)
       alert('Surovnoma muvaffaqiyatli yuborildi! Tez orada sizga mos hid yo\'nalishi bilan bog\'lanamiz.')
@@ -74,6 +82,7 @@ function Survey({ onNavigate }) {
         phone: ''
       })
     } catch (error) {
+      console.error('Error submitting survey:', error)
       alert('Surovnoma yuborishda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.')
     }
   }
@@ -138,14 +147,12 @@ function Survey({ onNavigate }) {
                 <label className="block text-sm font-medium mb-2 text-[#111111]">
                   Tug'ilgan sana <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="date"
-                  name="birthDate"
-                  required
+                <CustomDatePicker
                   value={formData.birthDate}
                   onChange={handleInputChange}
-                  max={new Date().toISOString().split('T')[0]} // Bugungi kundan oldingi sana
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold focus:border-transparent transition-all"
+                  max={new Date().toISOString().split('T')[0]}
+                  className="w-full"
+                  required
                 />
                 {formData.age && (
                   <p className="mt-2 text-sm text-gray-600">

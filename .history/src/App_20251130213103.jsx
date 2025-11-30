@@ -399,7 +399,7 @@ function LandingPage({ onNavigate }) {
               </div>
               <h3 className="text-xl font-bold text-[#111111] mb-2">HIDIM 10 ml PROBNIK</h3>
               <p className="text-gray-700 mb-4">Sizga mos hidni avval sinab ko'ring.</p>
-              <p className="text-2xl font-bold text-gold mb-4">{PRICES.PROBNIK_10ML} so'm</p>
+              <p className="text-2xl font-bold text-gold mb-4">45 000 so'm</p>
               <button
                 onClick={() => scrollToSection('sample')}
                 className="bg-[#111111] text-white px-6 py-2 rounded-md text-sm hover:bg-gold transition-colors"
@@ -459,7 +459,7 @@ function LandingPage({ onNavigate }) {
           </p>
           <div className="grid md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
             <div className="space-y-6">
-              <h3 className="text-2xl font-bold text-[#111111]">10 ml PROBNIK — {PRICES.PROBNIK_10ML} so'm</h3>
+              <h3 className="text-2xl font-bold text-[#111111]">10 ml PROBNIK — 45 000 so'm</h3>
               <ul className="space-y-4 text-gray-700">
                 <li className="flex items-start gap-3">
                   <span className="text-gold mt-1">✓</span>
@@ -471,7 +471,7 @@ function LandingPage({ onNavigate }) {
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-gold mt-1">✓</span>
-                  <span>Hid yoqmasa — 2-probnik faqat {PRICES.PROBNIK_2ND} so'm</span>
+                  <span>Hid yoqmasa — 2-probnik faqat 35 000 so'm</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-gold mt-1">✓</span>
@@ -543,8 +543,8 @@ function LandingPage({ onNavigate }) {
                 Yangi mijozlar uchun
               </span>
               <h3 className="text-xl font-semibold mb-2 text-[#111111]">10 ml Probnik</h3>
-              <p className="text-4xl font-bold text-gold mb-2">{PRICES.PROBNIK_10ML} so'm</p>
-              <p className="text-sm text-gray-600 mb-6">2-probnik — {PRICES.PROBNIK_2ND} so'm</p>
+              <p className="text-4xl font-bold text-gold mb-2">45 000 so'm</p>
+              <p className="text-sm text-gray-600 mb-6">2-probnik — 35 000 so'm</p>
               <button
                 onClick={() => scrollToSection('contact')}
                 className="w-full bg-[#111111] text-white px-6 py-3 rounded-md hover:bg-gold transition-colors font-medium"
@@ -559,7 +559,7 @@ function LandingPage({ onNavigate }) {
                 Eng ommabop
               </span>
               <h3 className="text-xl font-semibold mb-2 text-[#111111]">50 ml Eau de Parfum</h3>
-              <p className="text-4xl font-bold text-gold mb-2">{PRICES.EDP_50ML} so'm</p>
+              <p className="text-4xl font-bold text-gold mb-2">299 000 so'm</p>
               <p className="text-sm text-gray-600 mb-6">Sizga mos shaxsiy hid asosida tayyorlanadi.</p>
               <button
                 onClick={() => scrollToSection('contact')}
@@ -575,7 +575,7 @@ function LandingPage({ onNavigate }) {
                 Premium
               </span>
               <h3 className="text-xl font-semibold mb-2 text-[#111111]">100 ml Eau de Parfum</h3>
-              <p className="text-4xl font-bold text-gold mb-2">{PRICES.EDP_100ML} so'm</p>
+              <p className="text-4xl font-bold text-gold mb-2">499 000 so'm</p>
               <p className="text-sm text-gray-600 mb-6">Oilaviy yoki uzoq muddat foydalanish uchun.</p>
               <button
                 onClick={() => scrollToSection('contact')}
@@ -631,7 +631,7 @@ function LandingPage({ onNavigate }) {
               },
               {
                 q: "Probnik yoqmasa nima bo'ladi?",
-                a: `Birinchi probnik yoqmasa, ikkinchi probnikni ${PRICES.PROBNIK_2ND} so'm evaziga boshqa yo'nalishda sinab ko'rishingiz mumkin.`
+                a: "Birinchi probnik yoqmasa, ikkinchi probnikni 35 000 so'm evaziga boshqa yo'nalishda sinab ko'rishingiz mumkin."
               },
               {
                 q: "Yetkazib berish bormi?",
