@@ -213,11 +213,161 @@ function SurveysPage() {
       doc.text('www.hidim.uz | @hidim_parfum', pageWidth / 2, footerY, { align: 'center' })
     }
     
-    // PDF yuklab olish
+    // PDF yuklab olish - mobil brauzerlar uchun optimallashtirilgan
     const safeName = (survey.name || 'Foydalanuvchi').replace(/[^a-zA-Z0-9А-Яа-яЁё]/g, '_').substring(0, 20)
     const safeDate = formattedDate.replace(/[^0-9]/g, '-')
     const fileName = `HIDIM_Surovnoma_${safeName}_${safeDate}.pdf`
-    doc.save(fileName)
+    
+    // Mobil brauzerlar uchun Blob va URL.createObjectURL ishlatish
+    try {
+      // iOS Safari aniqlash
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
+      const isAndroid = /Android/.test(navigator.userAgent)
+      const isMobile = isIOS || isAndroid || window.innerWidth < 768
+      
+      if (isIOS) {
+        // iOS Safari uchun data URI ishlatish
+        // iOS Safari'da to'g'ridan-to'g'ri yuklab olish qiyin, shuning uchun yangi oynada ochamiz
+        const pdfDataUri = doc.output('datauristring')
+        
+        // Yangi oynada PDF ni ko'rsatish
+        const newWindow = window.open('', '_blank')
+        if (newWindow) {
+          newWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <title>${fileName}</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                  * { margin: 0; padding: 0; box-sizing: border-box; }
+                  body {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    background: #f5f5f5;
+                    padding: 20px;
+                  }
+                  .container {
+                    background: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    max-width: 100%;
+                  }
+                  h1 {
+                    color: #111;
+                    margin-bottom: 15px;
+                    font-size: 20px;
+                  }
+                  p {
+                    color: #666;
+                    margin-bottom: 15px;
+                    font-size: 14px;
+                    line-height: 1.5;
+                  }
+                  .button {
+                    display: inline-block;
+                    padding: 12px 24px;
+                    background: #111;
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 5px;
+                    margin: 10px 0;
+                    font-size: 16px;
+                  }
+                  iframe {
+                    width: 100%;
+                    height: 70vh;
+                    border: 1px solid #ddd;
+                    margin-top: 20px;
+                    border-radius: 5px;
+                  }
+                  .instructions {
+                    background: #fff3cd;
+                    padding: 15px;
+                    border-radius: 5px;
+                    margin-top: 20px;
+                    font-size: 13px;
+                    color: #856404;
+                  }
+                </style>
+              </head>
+              <body>
+                <div class="container">
+                  <h1>PDF yuklab olish</h1>
+                  <p>PDF fayl tayyor. Yuklab olish uchun quyidagi tugmani bosing:</p>
+                  <a href="${pdfDataUri}" download="${fileName}" class="button">📥 PDF yuklab olish</a>
+                  <iframe src="${pdfDataUri}"></iframe>
+                  <div class="instructions">
+                    <strong>Yuklab olish:</strong><br>
+                    1. PDF'ni ko'rib chiqing<br>
+                    2. Brauzerning "Share" tugmasini bosing (pastki o'ng burchak)<br>
+                    3. "Save to Files" yoki "Add to Photos" ni tanlang
+                  </div>
+                </div>
+              </body>
+            </html>
+          `)
+          newWindow.document.close()
+        } else {
+          // Agar pop-up blokirovka qilingan bo'lsa, data URI ni to'g'ridan-to'g'ri ochish
+          window.location.href = pdfDataUri
+        }
+      } else if (isMobile) {
+        // Android va boshqa mobil brauzerlar uchun
+        const pdfBlob = doc.output('blob')
+        const url = URL.createObjectURL(pdfBlob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = fileName
+        link.style.display = 'none'
+        document.body.appendChild(link)
+        link.click()
+        setTimeout(() => {
+          document.body.removeChild(link)
+          URL.revokeObjectURL(url)
+        }, 100)
+      } else {
+        // Desktop brauzerlar uchun
+        const pdfBlob = doc.output('blob')
+        const url = URL.createObjectURL(pdfBlob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = fileName
+        link.style.display = 'none'
+        document.body.appendChild(link)
+        link.click()
+        setTimeout(() => {
+          document.body.removeChild(link)
+          URL.revokeObjectURL(url)
+        }, 100)
+      }
+    } catch (error) {
+      console.error('PDF yuklab olishda xatolik:', error)
+      // Fallback: oddiy save metodi
+      try {
+        doc.save(fileName)
+      } catch (fallbackError) {
+        console.error('Fallback PDF yuklab olishda xatolik:', fallbackError)
+        // Eng oxirgi fallback: data URI
+        try {
+          const pdfDataUri = doc.output('datauristring')
+          const link = document.createElement('a')
+          link.href = pdfDataUri
+          link.download = fileName
+          link.target = '_blank'
+          link.style.display = 'none'
+          document.body.appendChild(link)
+          link.click()
+          setTimeout(() => {
+            if (link.parentNode) {
+              document.body.removeChild(link)
+            }
+          }, 100)
+        } catch (finalError) {
+          console.error('Barcha PDF yuklab olish usullari muvaffaqiyatsiz:', finalError)
+          alert('PDF yuklab olishda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring yoki boshqa brauzerda sinab ko\'ring.')
+        }
+      }
+    }
   }
 
   if (loading) {
