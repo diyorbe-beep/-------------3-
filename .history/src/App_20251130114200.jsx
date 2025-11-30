@@ -78,7 +78,7 @@ function LandingPage({ onNavigate }) {
     try {
       setIsLoading(true)
       // Mijozni yaratish yoki yangilash
-      const customer = await customersAPI.create({
+      await customersAPI.create({
         name: googleUserInfo.name || 'Foydalanuvchi',
         email: googleUserInfo.email || '',
         phone: phoneForGoogle,
@@ -87,27 +87,6 @@ function LandingPage({ onNavigate }) {
         orders: 0,
         profile: ''
       })
-      
-      // Google orqali ro'yxatdan o'tganda avtomatik buyurtma yaratish
-      try {
-        const orderData = {
-          customer: googleUserInfo.name || 'Foydalanuvchi',
-          phone: phoneForGoogle,
-          email: googleUserInfo.email || '',
-          product: '10 ml Probnik', // Default probnik
-          price: '45 000',
-          comment: 'Google orqali ro\'yxatdan o\'tish',
-          status: 'Yangi',
-          date: new Date().toISOString().split('T')[0]
-        }
-        
-        console.log('📤 Google orqali buyurtma yuborilmoqda:', orderData)
-        const orderResult = await ordersAPI.create(orderData)
-        console.log('✅ Google orqali buyurtma yaratildi:', orderResult)
-      } catch (orderError) {
-        console.error('❌ Google orqali buyurtma yaratishda xatolik:', orderError)
-        // Buyurtma yaratilmagan bo'lsa ham davom etamiz
-      }
       
       alert('Buyurtma qoldirildi! Tez orada siz bilan bog\'lanamiz.')
       setShowPhoneModal(false)
@@ -125,31 +104,10 @@ function LandingPage({ onNavigate }) {
           if (existingCustomer) {
             await customersAPI.update(existingCustomer.id, { phone: phoneForGoogle })
           }
-          
-          // Google orqali ro'yxatdan o'tganda avtomatik buyurtma yaratish
-          try {
-            const orderData = {
-              customer: googleUserInfo.name || 'Foydalanuvchi',
-              phone: phoneForGoogle,
-              email: googleUserInfo.email || '',
-              product: '10 ml Probnik', // Default probnik
-              price: '45 000',
-              comment: 'Google orqali ro\'yxatdan o\'tish',
-              status: 'Yangi',
-              date: new Date().toISOString().split('T')[0]
-            }
-            
-            console.log('📤 Google orqali buyurtma yuborilmoqda:', orderData)
-            const orderResult = await ordersAPI.create(orderData)
-            console.log('✅ Google orqali buyurtma yaratildi:', orderResult)
-          } catch (orderError) {
-            console.error('❌ Google orqali buyurtma yaratishda xatolik:', orderError)
-            // Buyurtma yaratilmagan bo'lsa ham davom etamiz
-          }
         } catch (updateError) {
           console.error('Error updating customer phone:', updateError)
         }
-        alert('Buyurtma qoldirildi! Tez orada siz bilan bog\'lanamiz.')
+        alert(`Xush kelibsiz, ${googleUserInfo.name || googleUserInfo.email}!`)
       } else {
         alert('Ro\'yxatdan o\'tishda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.')
       }

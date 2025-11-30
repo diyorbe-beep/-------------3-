@@ -125,27 +125,6 @@ function LandingPage({ onNavigate }) {
           if (existingCustomer) {
             await customersAPI.update(existingCustomer.id, { phone: phoneForGoogle })
           }
-          
-          // Google orqali ro'yxatdan o'tganda avtomatik buyurtma yaratish
-          try {
-            const orderData = {
-              customer: googleUserInfo.name || 'Foydalanuvchi',
-              phone: phoneForGoogle,
-              email: googleUserInfo.email || '',
-              product: '10 ml Probnik', // Default probnik
-              price: '45 000',
-              comment: 'Google orqali ro\'yxatdan o\'tish',
-              status: 'Yangi',
-              date: new Date().toISOString().split('T')[0]
-            }
-            
-            console.log('📤 Google orqali buyurtma yuborilmoqda:', orderData)
-            const orderResult = await ordersAPI.create(orderData)
-            console.log('✅ Google orqali buyurtma yaratildi:', orderResult)
-          } catch (orderError) {
-            console.error('❌ Google orqali buyurtma yaratishda xatolik:', orderError)
-            // Buyurtma yaratilmagan bo'lsa ham davom etamiz
-          }
         } catch (updateError) {
           console.error('Error updating customer phone:', updateError)
         }

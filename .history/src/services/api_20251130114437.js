@@ -65,16 +65,9 @@ export const ordersAPI = {
   getById: (id) => apiCall(`/api/orders/${id}`),
   create: async (data) => {
     console.log('📡 POST /api/orders so\'rovi yuborilmoqda:', data)
-    console.log('📡 POST /api/orders - JSON:', JSON.stringify(data, null, 2))
-    try {
-      const result = await apiCall('/api/orders', { method: 'POST', body: JSON.stringify(data) })
-      console.log('📦 POST /api/orders javobi:', result)
-      console.log('📦 POST /api/orders - Buyurtma ID:', result?.id)
-      return result
-    } catch (error) {
-      console.error('❌ POST /api/orders xatosi:', error)
-      throw error
-    }
+    const result = await apiCall('/api/orders', { method: 'POST', body: JSON.stringify(data) })
+    console.log('📦 POST /api/orders javobi:', result)
+    return result
   },
   update: (id, data) => apiCall(`/api/orders/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   delete: (id) => apiCall(`/api/orders/${id}`, { method: 'DELETE' }),
