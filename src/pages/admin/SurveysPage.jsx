@@ -151,6 +151,23 @@ function SurveysPage() {
     
     // Ma'lumotlar
     writeField('Ism', survey.name)
+    
+    // Tug'ilgan sana va yosh
+    const birthDate = survey.birthDate || survey.birth_date
+    if (birthDate) {
+      try {
+        const date = new Date(birthDate)
+        const formattedBirthDate = date.toLocaleDateString('uz-UZ', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+        })
+        writeField('Tug\'ilgan sana', formattedBirthDate)
+      } catch (e) {
+        writeField('Tug\'ilgan sana', birthDate)
+      }
+    }
+    
     writeField('Yosh', survey.age)
     writeField('Jins', survey.gender)
     writeField('Fasl', survey.season)
@@ -212,21 +229,21 @@ function SurveysPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-[#111111]">So'rovlar (Surovnomalar)</h1>
+    <div className="space-y-4 lg:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <h1 className="text-2xl lg:text-3xl font-bold text-[#111111]">So'rovlar (Surovnomalar)</h1>
         <button
           onClick={loadSurveys}
-          className="px-4 py-2 bg-gold text-white rounded-lg hover:bg-brown transition-colors font-medium"
+          className="px-4 py-2 bg-gold text-white rounded-lg hover:bg-brown transition-colors font-medium text-sm lg:text-base whitespace-nowrap"
         >
           🔄 Yangilash
         </button>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-[#111111] mb-4">Filtrlar</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="bg-white rounded-lg shadow-sm p-4 lg:p-6">
+        <h2 className="text-base lg:text-lg font-semibold text-[#111111] mb-4">Filtrlar</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 lg:gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Ism</label>
             <input
@@ -261,7 +278,68 @@ function SurveysPage() {
 
       {/* Surveys Table */}
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Mobile Card View */}
+        <div className="lg:hidden divide-y divide-gray-200">
+          {filteredSurveys.length > 0 ? (
+            filteredSurveys.map((survey) => (
+              <div key={survey.id} className="p-4 space-y-2 hover:bg-cream/50">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <p className="text-xs text-gray-500">ID</p>
+                    <p className="text-sm font-medium text-gray-900">#{String(survey.id).substring(0, 8)}...</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setSelectedSurvey(survey)}
+                      className="px-2 py-1 text-xs bg-gold text-white rounded hover:bg-brown"
+                    >
+                      Ko'rish
+                    </button>
+                    <button
+                      onClick={() => handleDownloadPDF(survey)}
+                      className="px-2 py-1 text-xs bg-[#111111] text-white rounded hover:bg-gray-700 flex items-center gap-1"
+                      title="PDF yuklab olish"
+                    >
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      PDF
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Ism</p>
+                  <p className="text-sm font-medium text-gray-900">{survey.name || 'Aniqlanmagan'}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <p className="text-xs text-gray-500">Telefon</p>
+                    <p className="text-sm text-gray-900">{survey.phone || 'Aniqlanmagan'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Yosh</p>
+                    <p className="text-sm text-gray-900">{survey.age || 'Aniqlanmagan'}</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <p className="text-xs text-gray-500">Jins</p>
+                    <p className="text-sm text-gray-900">{survey.gender || 'Aniqlanmagan'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Sana</p>
+                    <p className="text-sm text-gray-900">{formatDate(survey.createdAt)}</p>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="py-8 text-center text-gray-500">So'rovlar topilmadi</div>
+          )}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden lg:block overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
@@ -320,19 +398,19 @@ function SurveysPage() {
       {selectedSurvey && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-[#111111]">So'rov ma'lumotlari</h2>
+            <div className="p-4 lg:p-6">
+              <div className="flex items-center justify-between mb-4 lg:mb-6">
+                <h2 className="text-xl lg:text-2xl font-bold text-[#111111]">So'rov ma'lumotlari</h2>
                 <button
                   onClick={() => setSelectedSurvey(null)}
-                  className="text-gray-400 hover:text-gray-600 text-2xl"
+                  className="text-gray-400 hover:text-gray-600 text-2xl lg:text-3xl"
                 >
                   ×
                 </button>
               </div>
 
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Ism</label>
                     <p className="text-gray-900">{selectedSurvey.name || 'Aniqlanmagan'}</p>
@@ -389,19 +467,19 @@ function SurveysPage() {
                 </div>
               </div>
 
-              <div className="mt-6 flex justify-end gap-3">
+              <div className="mt-4 lg:mt-6 flex flex-col sm:flex-row justify-end gap-2 lg:gap-3">
                 <button
                   onClick={() => handleDownloadPDF(selectedSurvey)}
-                  className="px-6 py-2 bg-white border-2 border-[#111111] text-[#111111] rounded-lg hover:bg-cream transition-colors flex items-center gap-2"
+                  className="w-full sm:w-auto px-4 lg:px-6 py-2 bg-white border-2 border-[#111111] text-[#111111] rounded-lg hover:bg-cream transition-colors flex items-center justify-center gap-2 text-sm lg:text-base"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                   PDF yuklab olish
                 </button>
                 <button
                   onClick={() => setSelectedSurvey(null)}
-                  className="px-6 py-2 bg-[#111111] text-white rounded-lg hover:bg-gold transition-colors"
+                  className="w-full sm:w-auto px-4 lg:px-6 py-2 bg-[#111111] text-white rounded-lg hover:bg-gold transition-colors text-sm lg:text-base"
                 >
                   Yopish
                 </button>

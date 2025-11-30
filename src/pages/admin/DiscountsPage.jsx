@@ -79,12 +79,12 @@ function DiscountsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-[#111111]">Chegirmalar</h1>
+    <div className="space-y-4 lg:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <h1 className="text-2xl lg:text-3xl font-bold text-[#111111]">Chegirmalar</h1>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="px-6 py-2 bg-[#111111] text-white rounded-lg hover:bg-gold transition-colors"
+          className="px-4 lg:px-6 py-2 bg-[#111111] text-white rounded-lg hover:bg-gold transition-colors text-sm lg:text-base whitespace-nowrap"
         >
           {showForm ? 'Bekor qilish' : 'Yangi promo kod qo\'shish'}
         </button>
@@ -92,8 +92,8 @@ function DiscountsPage() {
 
       {/* Add Promo Code Form */}
       {showForm && (
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-[#111111] mb-4">Yangi promo kod</h2>
+        <div className="bg-white rounded-lg shadow-sm p-4 lg:p-6">
+          <h2 className="text-lg lg:text-xl font-semibold text-[#111111] mb-4">Yangi promo kod</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Promo kod nomi</label>
@@ -142,7 +142,53 @@ function DiscountsPage() {
 
       {/* Promo Codes Table */}
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Mobile Card View */}
+        <div className="lg:hidden divide-y divide-gray-200">
+          {promoCodes.length > 0 ? (
+            promoCodes.map((promo) => (
+              <div key={promo.id} className="p-4 space-y-2 hover:bg-cream/50">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <p className="text-xs text-gray-500">Promo kod</p>
+                    <p className="text-sm font-mono font-semibold text-gray-900">{promo.code}</p>
+                  </div>
+                  <span className={`inline-block px-2 py-1 text-xs rounded-full ${
+                    promo.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+                  } whitespace-nowrap ml-2`}>
+                    {promo.active ? 'Aktiv' : 'Noaktiv'}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Chegirma foizi</p>
+                  <p className="text-sm font-semibold text-gray-900">{promo.discount}%</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Izoh</p>
+                  <p className="text-sm text-gray-900">{promo.description}</p>
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <button
+                    onClick={() => toggleActive(promo.id)}
+                    className="flex-1 px-3 py-1.5 bg-gold text-white rounded-lg hover:bg-brown text-sm font-medium"
+                  >
+                    {promo.active ? 'Noaktiv' : 'Aktiv'}
+                  </button>
+                  <button
+                    onClick={() => handleDelete(promo.id)}
+                    className="flex-1 px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-700 text-sm font-medium"
+                  >
+                    O'chirish
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="py-8 text-center text-gray-500">Promo kodlar topilmadi</div>
+          )}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden lg:block overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>

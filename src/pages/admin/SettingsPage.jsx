@@ -57,14 +57,14 @@ function SettingsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-[#111111]">Sozlamalar</h1>
+    <div className="space-y-4 lg:space-y-6">
+      <h1 className="text-2xl lg:text-3xl font-bold text-[#111111]">Sozlamalar</h1>
 
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <h2 className="text-xl font-semibold text-[#111111] mb-4">Kontakt ma'lumotlari</h2>
+      <div className="bg-white rounded-lg shadow-sm p-4 lg:p-6">
+        <form onSubmit={handleSubmit} className="space-y-4 lg:space-y-6">
+          <h2 className="text-lg lg:text-xl font-semibold text-[#111111] mb-4">Kontakt ma'lumotlari</h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 lg:gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Telegram username</label>
               <input

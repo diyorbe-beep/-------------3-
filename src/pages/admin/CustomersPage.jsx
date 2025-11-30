@@ -38,23 +38,63 @@ function CustomersPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-[#111111]">Mijozlar</h1>
+    <div className="space-y-4 lg:space-y-6">
+      <h1 className="text-2xl lg:text-3xl font-bold text-[#111111]">Mijozlar</h1>
 
       {/* Search */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-white rounded-lg shadow-sm p-4 lg:p-6">
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Ism yoki telefon bo'yicha qidirish"
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold"
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold text-sm lg:text-base"
         />
       </div>
 
       {/* Customers Table */}
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Mobile Card View */}
+        <div className="lg:hidden divide-y divide-gray-200">
+          {filteredCustomers.length > 0 ? (
+            filteredCustomers.map((customer, index) => (
+              <div key={customer.id || index} className="p-4 space-y-2 hover:bg-cream/50">
+                <div>
+                  <p className="text-xs text-gray-500">Ism</p>
+                  <p className="text-sm font-medium text-gray-900">{customer.name}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <p className="text-xs text-gray-500">Yosh</p>
+                    <p className="text-sm text-gray-900">{customer.age}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Jins</p>
+                    <p className="text-sm text-gray-900">{customer.gender}</p>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Telefon</p>
+                  <p className="text-sm text-gray-900">{customer.phone}</p>
+                </div>
+                <div className="flex justify-between items-center pt-2">
+                  <div>
+                    <p className="text-xs text-gray-500">Buyurtmalar</p>
+                    <p className="text-sm font-semibold text-gray-900">{customer.orders || 0} ta</p>
+                  </div>
+                  <span className="inline-block px-2 py-1 text-xs rounded-full bg-gold/20 text-gold">
+                    {customer.profile || 'Aniqlanmagan'}
+                  </span>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="py-8 text-center text-gray-500">Mijozlar topilmadi</div>
+          )}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden lg:block overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>

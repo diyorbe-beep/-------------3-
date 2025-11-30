@@ -6,6 +6,7 @@ function Survey({ onNavigate }) {
   const [formData, setFormData] = useState({
     name: '',
     age: '',
+    birthDate: '',
     gender: '',
     season: '',
     character: [],
@@ -16,12 +17,32 @@ function Survey({ onNavigate }) {
     phone: ''
   })
 
+  // Tug'ilgan sanadan yoshni hisoblash
+  const calculateAge = (birthDate) => {
+    if (!birthDate) return ''
+    const today = new Date()
+    const birth = new Date(birthDate)
+    let age = today.getFullYear() - birth.getFullYear()
+    const monthDiff = today.getMonth() - birth.getMonth()
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--
+    }
+    return age > 0 ? age.toString() : ''
+  }
+
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
+    setFormData(prev => {
+      const updated = {
+        ...prev,
+        [name]: value
+      }
+      // Agar tug'ilgan sana o'zgarsa, yoshni avtomatik hisobla
+      if (name === 'birthDate') {
+        updated.age = calculateAge(value)
+      }
+      return updated
+    })
   }
 
   const handleCheckboxChange = (e) => {
@@ -42,6 +63,7 @@ function Survey({ onNavigate }) {
       setFormData({
         name: '',
         age: '',
+        birthDate: '',
         gender: '',
         season: '',
         character: [],
@@ -112,22 +134,25 @@ function Survey({ onNavigate }) {
                 />
               </div>
 
-              {/* 2. Yosh */}
+              {/* 2. Tug'ilgan sana */}
               <div>
                 <label className="block text-sm font-medium mb-2 text-[#111111]">
-                  Yosh <span className="text-red-500">*</span>
+                  Tug'ilgan sana <span className="text-red-500">*</span>
                 </label>
                 <input
-                  type="number"
-                  name="age"
+                  type="date"
+                  name="birthDate"
                   required
-                  min="1"
-                  max="120"
-                  value={formData.age}
+                  value={formData.birthDate}
                   onChange={handleInputChange}
+                  max={new Date().toISOString().split('T')[0]} // Bugungi kundan oldingi sana
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold focus:border-transparent transition-all"
-                  placeholder="Yoshingizni kiriting"
                 />
+                {formData.age && (
+                  <p className="mt-2 text-sm text-gray-600">
+                    Yoshingiz: <span className="font-semibold">{formData.age} yosh</span>
+                  </p>
+                )}
               </div>
 
               {/* 3. Jins */}
