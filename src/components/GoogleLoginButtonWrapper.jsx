@@ -4,30 +4,24 @@ import GoogleLoginButton from './GoogleLoginButton'
 class ErrorBoundary extends Component {
   constructor(props) {
     super(props)
-    this.state = { hasError: false, error: null }
+    this.state = { hasError: false }
   }
 
   static getDerivedStateFromError(error) {
-    return { hasError: true, error }
+    return { hasError: true }
   }
 
   componentDidCatch(error, errorInfo) {
-    // Xatolikni log qilish
+    // Xatolikni log qilish mumkin
   }
 
   render() {
     if (this.state.hasError) {
       return (
-        <div className="w-full p-4 bg-red-50 border border-red-200 rounded-lg text-center">
-          <p className="text-sm text-red-800 mb-2">
-            Google orqali ro'yxatdan o'tishda xatolik yuz berdi.
+        <div className="text-center p-4">
+          <p className="text-red-600 text-sm">
+            Google orqali ro'yxatdan o'tishda xatolik yuz berdi. Iltimos, telefon raqam bilan ro'yxatdan o'ting.
           </p>
-          <button
-            onClick={() => this.setState({ hasError: false, error: null })}
-            className="text-sm text-red-600 hover:text-red-800 underline"
-          >
-            Qayta urinib ko'ring
-          </button>
         </div>
       )
     }

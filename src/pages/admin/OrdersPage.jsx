@@ -24,14 +24,53 @@ function OrdersPage() {
   const loadOrders = async () => {
     try {
       setLoading(true)
+      console.log('🔄 Buyurtmalar yuklanmoqda...')
+      console.log('🌐 Backend URL: https://atir.onrender.com/api/orders')
+      
       const data = await ordersAPI.getAll()
+      console.log('✅ Buyurtmalar yuklandi:', data)
+      console.log('📊 Buyurtmalar soni:', Array.isArray(data) ? data.length : 0)
       
       // Agar data array bo'lmasa, bo'sh array qaytaramiz
       const ordersArray = Array.isArray(data) ? data : []
       setOrders(ordersArray)
+      
+      if (ordersArray.length === 0) {
+        console.warn('⚠️ Buyurtmalar topilmadi. Backend\'dan bo\'sh array qaytdi.')
+        console.warn('⚠️ Backend URL:', 'https://atir.onrender.com/api/orders')
+        console.warn('⚠️ Tekshirish: Backend server ishlayaptimi?')
+        console.warn('⚠️ Yechim: Backend serverni tekshiring yoki local backend\'ni ishga tushiring')
+        
+        // Backend server ishlayaptimi tekshirish
+        try {
+          const healthCheck = await fetch('https://atir.onrender.com/api/health')
+          if (healthCheck.ok) {
+            const health = await healthCheck.json()
+            console.log('✅ Backend server ishlayapti:', health)
+          } else {
+            console.error('❌ Backend server javob bermayapti')
+          }
+        } catch (healthError) {
+          console.error('❌ Backend serverga ulanishda xatolik:', healthError)
+          console.error('❌ Ehtimol, backend server ishlamayapti yoki internet muammosi bor')
+        }
+      } else {
+        console.log('✅ Buyurtmalar muvaffaqiyatli yuklandi!')
+        console.log('✅ Birinchi buyurtma:', ordersArray[0])
+      }
     } catch (error) {
+      console.error('❌ Error loading orders:', error)
+      console.error('❌ Error details:', error.message)
+      console.error('❌ Error stack:', error.stack)
+      console.error('❌ Backend serverga ulanishda muammo bo\'lishi mumkin')
+      
       // Xatolik bo'lsa ham bo'sh array qo'yamiz
       setOrders([])
+      
+      // Faqat birinchi marta xatolik bo'lsa alert ko'rsatamiz
+      if (orders.length === 0) {
+        console.error('❌ Buyurtmalarni yuklashda xatolik. Backend server ishlayaptimi?')
+      }
     } finally {
       setLoading(false)
     }
@@ -56,6 +95,7 @@ function OrdersPage() {
       setSelectedOrder({ ...selectedOrder, status: newStatus })
       alert('Holat yangilandi!')
     } catch (error) {
+      console.error('Error updating order:', error)
       alert('Holatni yangilashda xatolik yuz berdi')
     }
   }

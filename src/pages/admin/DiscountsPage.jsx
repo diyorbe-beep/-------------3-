@@ -65,46 +65,28 @@ function DiscountsPage() {
           <h2 className="text-xl font-semibold text-[#111111] mb-4">Yangi promo kod qo'shish</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2 text-[#111111]">
-                Promo kod <span className="text-red-500">*</span>
-              </label>
+              <label className="block text-sm font-medium mb-2 text-[#111111]">Kod</label>
               <input
                 type="text"
                 required
                 value={formData.code}
-                onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
+                onChange={(e) => setFormData({ ...formData, code: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold"
-                placeholder="Masalan: WELCOME10"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2 text-[#111111]">
-                Chegirma <span className="text-red-500">*</span>
-              </label>
+              <label className="block text-sm font-medium mb-2 text-[#111111]">Chegirma (%)</label>
               <input
-                type="text"
+                type="number"
                 required
                 value={formData.discount}
                 onChange={(e) => setFormData({ ...formData, discount: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold"
-                placeholder="Masalan: 10% yoki 50000 so'm"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2 text-[#111111]">
-                Tavsif
-              </label>
-              <textarea
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold"
-                rows="3"
-                placeholder="Promo kod tavsifi..."
               />
             </div>
             <button
               type="submit"
-              className="w-full bg-[#111111] text-white px-4 py-2 rounded-lg hover:bg-gold transition-colors"
+              className="px-6 py-2 bg-[#111111] text-white rounded-lg hover:bg-gold transition-colors"
             >
               Qo'shish
             </button>
@@ -112,71 +94,34 @@ function DiscountsPage() {
         </div>
       )}
 
-      {/* Desktop Table */}
-      <div className="hidden md:block bg-white rounded-lg shadow-sm overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Promo kod</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Chegirma</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tavsif</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {discounts.length > 0 ? (
-              discounts.map((discount) => (
-                <tr key={discount.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#111111]">
-                    {discount.code}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                    {discount.discount}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-700">
-                    {discount.description || '-'}
-                  </td>
+      {discounts.length > 0 ? (
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Kod</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Chegirma</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Tavsif</th>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="3" className="px-6 py-8 text-center text-gray-500">
-                  Promo kodlar topilmadi
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Mobile Cards */}
-      <div className="md:hidden space-y-4">
-        {discounts.length > 0 ? (
-          discounts.map((discount) => (
-            <div key={discount.id} className="bg-white rounded-lg shadow-sm p-4">
-              <div className="space-y-2">
-                <div>
-                  <p className="text-xs text-gray-500">Promo kod</p>
-                  <p className="text-sm font-medium text-[#111111]">{discount.code}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Chegirma</p>
-                  <p className="text-sm text-gray-700">{discount.discount}</p>
-                </div>
-                {discount.description && (
-                  <div>
-                    <p className="text-xs text-gray-500">Tavsif</p>
-                    <p className="text-sm text-gray-700">{discount.description}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))
-        ) : (
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
-            Promo kodlar topilmadi
+              </thead>
+              <tbody>
+                {discounts.map((discount) => (
+                  <tr key={discount.id} className="border-b border-gray-100 hover:bg-cream/50">
+                    <td className="py-3 px-4 text-sm text-gray-700 font-medium">{discount.code}</td>
+                    <td className="py-3 px-4 text-sm text-gray-700">{discount.discount}%</td>
+                    <td className="py-3 px-4 text-sm text-gray-700">{discount.description || 'Tavsif yo\'q'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+          <p className="text-gray-500">Hozircha promo kodlar yo'q</p>
+        </div>
+      )}
     </div>
   )
 }

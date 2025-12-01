@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { feedbackAPI } from '../../services/api'
 
 function FeedbackPage() {
-  const [feedbacks, setFeedbacks] = useState([])
+  const [feedback, setFeedback] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -13,9 +13,9 @@ function FeedbackPage() {
     try {
       setLoading(true)
       const data = await feedbackAPI.getAll()
-      setFeedbacks(Array.isArray(data) ? data : [])
+      setFeedback(Array.isArray(data) ? data : [])
     } catch (error) {
-      setFeedbacks([])
+      setFeedback([])
     } finally {
       setLoading(false)
     }
@@ -31,38 +31,36 @@ function FeedbackPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-[#111111]">Feedback</h1>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {feedbacks.length > 0 ? (
-          feedbacks.map((feedback) => (
-            <div key={feedback.id} className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-[#111111]">{feedback.customer}</h3>
-                  <p className="text-sm text-gray-600 mt-1">{feedback.product}</p>
-                </div>
-              </div>
-              <p className="text-gray-700 mb-4 leading-relaxed">{feedback.comment}</p>
-              {feedback.videoUrl && (
-                <a
-                  href={feedback.videoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gold hover:text-brown text-sm font-medium flex items-center gap-2"
-                >
-                  <span>▶</span>
-                  Video URL
-                </a>
-              )}
-            </div>
-          ))
-        ) : (
-          <div className="col-span-2 text-center text-gray-500 py-8">
-            Feedback topilmadi
-          </div>
-        )}
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold text-[#111111]">Feedback</h1>
+        <button
+          onClick={loadFeedback}
+          className="px-4 py-2 bg-gold text-white rounded-lg hover:bg-brown transition-colors"
+        >
+          Yangilash
+        </button>
       </div>
+
+      {feedback.length > 0 ? (
+        <div className="space-y-4">
+          {feedback.map((item) => (
+            <div key={item.id} className="bg-white rounded-lg shadow-sm p-6">
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <p className="font-semibold text-[#111111]">{item.name || 'Aniqlanmagan'}</p>
+                  <p className="text-sm text-gray-600">{item.email || item.phone || 'Kontakt yo\'q'}</p>
+                </div>
+                <p className="text-xs text-gray-500">{item.date || item.createdAt || ''}</p>
+              </div>
+              <p className="text-gray-700">{item.message || item.comment || 'Xabar yo\'q'}</p>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+          <p className="text-gray-500">Hozircha feedback yo'q</p>
+        </div>
+      )}
     </div>
   )
 }

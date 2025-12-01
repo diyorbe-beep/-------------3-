@@ -81,8 +81,12 @@ export const customersAPI = {
     console.log('📦 GET /api/customers javobi:', result)
     return result
   },
+  getById: (id) => apiCall(`/api/customers/${id}`),
   create: (data) => apiCall('/api/customers', { method: 'POST', body: JSON.stringify(data) }),
   update: (id, data) => apiCall(`/api/customers/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  register: (data) => apiCall('/api/customers/register', { method: 'POST', body: JSON.stringify(data) }),
+  login: (data) => apiCall('/api/customers/login', { method: 'POST', body: JSON.stringify(data) }),
+  getOrders: (id) => apiCall(`/api/customers/${id}/orders`),
 }
 
 // Profiles API

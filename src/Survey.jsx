@@ -3,11 +3,13 @@ import { surveysAPI } from './services/api'
 import CustomDatePicker from './components/CustomDatePicker'
 import './App.css'
 
-function Survey({ onNavigate }) {
+function Survey({ onNavigate, customer }) {
   const [formData, setFormData] = useState({
-    name: '',
-    age: '',
-    birthDate: '',
+    name: customer?.firstName || '',
+    lastName: customer?.lastName || '', // Familiya (majburiy)
+    middleName: '', // Sharif (ixtiyoriy)
+    birthDate: '', // Tug'ilgan sana
+    age: '', // Avtomatik hisoblanadi
     gender: '',
     season: '',
     character: [],
@@ -15,7 +17,7 @@ function Survey({ onNavigate }) {
     dislikedScents: '',
     intensity: '',
     occasion: '',
-    phone: ''
+    phone: customer?.phone || ''
   })
 
   // Tug'ilgan sanadan yoshni hisoblash
@@ -58,20 +60,15 @@ function Survey({ onNavigate }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
-    // Required validation
-    if (!formData.birthDate) {
-      alert('Iltimos, tug\'ilgan sanangizni kiriting.')
-      return
-    }
-    
     try {
       await surveysAPI.create(formData)
       alert('Surovnoma muvaffaqiyatli yuborildi! Tez orada sizga mos hid yo\'nalishi bilan bog\'lanamiz.')
       setFormData({
         name: '',
-        age: '',
+        lastName: '',
+        middleName: '',
         birthDate: '',
+        age: '',
         gender: '',
         season: '',
         character: [],
@@ -129,7 +126,7 @@ function Survey({ onNavigate }) {
               {/* 1. Ismingiz */}
               <div>
                 <label className="block text-sm font-medium mb-2 text-[#111111]">
-                  Ismingiz <span className="text-red-500">*</span>
+                  Ism <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -142,17 +139,49 @@ function Survey({ onNavigate }) {
                 />
               </div>
 
+              {/* 1.1. Familiya */}
+              <div>
+                <label className="block text-sm font-medium mb-2 text-[#111111]">
+                  Familiya <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="lastName"
+                  required
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold focus:border-transparent transition-all"
+                  placeholder="Familiyangizni kiriting"
+                />
+              </div>
+
+              {/* 1.2. Sharif */}
+              <div>
+                <label className="block text-sm font-medium mb-2 text-[#111111]">
+                  Sharif (ixtiyoriy)
+                </label>
+                <input
+                  type="text"
+                  name="middleName"
+                  value={formData.middleName}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold focus:border-transparent transition-all"
+                  placeholder="Sharifingizni kiriting"
+                />
+              </div>
+
               {/* 2. Tug'ilgan sana */}
               <div>
                 <label className="block text-sm font-medium mb-2 text-[#111111]">
                   Tug'ilgan sana <span className="text-red-500">*</span>
                 </label>
                 <CustomDatePicker
+                  name="birthDate"
+                  required
                   value={formData.birthDate}
                   onChange={handleInputChange}
-                  max={new Date().toISOString().split('T')[0]}
+                  max={new Date().toISOString().split('T')[0]} // Bugungi kundan oldingi sana
                   className="w-full"
-                  required
                 />
                 {formData.age && (
                   <p className="mt-2 text-sm text-gray-600">
@@ -230,21 +259,50 @@ function Survey({ onNavigate }) {
               {/* 5. Xarakter */}
               <div>
                 <label className="block text-sm font-medium mb-3 text-[#111111]">
-                  Xarakteringizni tasvirlang (bir nechta belgilash mumkin) <span className="text-red-500">*</span>
+                  Xarakteringizni tasvirlang (bir nechta tanlash mumkin) <span className="text-red-500">*</span>
                 </label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {['Lider', 'Sokin', 'Energetik', 'Romantik', 'Minimalist', 'Jiddiy', 'Sportchi'].map((char) => (
-                    <label key={char} className="flex items-center gap-3 cursor-pointer p-3 rounded-lg hover:bg-cream transition-colors">
-                      <input
-                        type="checkbox"
-                        value={char.toLowerCase()}
-                        checked={formData.character.includes(char.toLowerCase())}
-                        onChange={handleCheckboxChange}
-                        className="w-4 h-4 text-gold focus:ring-gold rounded"
-                      />
-                      <span className="text-gray-700">{char}</span>
-                    </label>
-                  ))}
+                <p className="text-xs text-gray-500 mb-3">
+                  Pastdagi hashtag tugmalaridan o&apos;zingizga mos xarakter(lar)ni tanlang.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    'Lider',
+                    'Sokin',
+                    'Energetik',
+                    'Romantik',
+                    'Minimalist',
+                    'Jiddiy',
+                    'Sportchi',
+                    'Ijodkor',
+                    'Hazilkash',
+                    'Tinchsevar',
+                    'Ekstrovert',
+                    'Introvert'
+                  ].map((char) => {
+                    const value = char.toLowerCase()
+                    const isActive = formData.character.includes(value)
+                    return (
+                      <button
+                        key={char}
+                        type="button"
+                        onClick={() => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            character: prev.character.includes(value)
+                              ? prev.character.filter((item) => item !== value)
+                              : [...prev.character, value]
+                          }))
+                        }}
+                        className={`px-3 py-1.5 rounded-full border text-sm transition-all ${
+                          isActive
+                            ? 'bg-gold text-white border-gold shadow-sm'
+                            : 'bg-cream text-gray-700 border-gray-300 hover:border-gold hover:text-gold'
+                        }`}
+                      >
+                        #{char}
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
 

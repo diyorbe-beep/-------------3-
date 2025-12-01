@@ -41,77 +41,36 @@ function CustomersPage() {
         </button>
       </div>
 
-      {/* Desktop Table */}
-      <div className="hidden md:block bg-white rounded-lg shadow-sm overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ism</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telefon</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sana</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {customers.length > 0 ? (
-              customers.map((customer) => (
-                <tr key={customer.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#111111]">
-                    {customer.name || 'Noma\'lum'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                    {customer.phone || '-'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                    {customer.email || '-'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                    {customer.createdAt || customer.date || '-'}
-                  </td>
+      {customers.length > 0 ? (
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Ism</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Email</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Telefon</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Buyurtmalar</th>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" className="px-6 py-8 text-center text-gray-500">
-                  Mijozlar topilmadi
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Mobile Cards */}
-      <div className="md:hidden space-y-4">
-        {customers.length > 0 ? (
-          customers.map((customer) => (
-            <div key={customer.id} className="bg-white rounded-lg shadow-sm p-4">
-              <div className="space-y-2">
-                <div>
-                  <p className="text-xs text-gray-500">Ism</p>
-                  <p className="text-sm font-medium text-[#111111]">{customer.name || 'Noma\'lum'}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Telefon</p>
-                  <p className="text-sm text-gray-700">{customer.phone || '-'}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Email</p>
-                  <p className="text-sm text-gray-700">{customer.email || '-'}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Sana</p>
-                  <p className="text-sm text-gray-700">{customer.createdAt || customer.date || '-'}</p>
-                </div>
-              </div>
-            </div>
-          ))
-        ) : (
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
-            Mijozlar topilmadi
+              </thead>
+              <tbody>
+                {customers.map((customer) => (
+                  <tr key={customer.id} className="border-b border-gray-100 hover:bg-cream/50">
+                    <td className="py-3 px-4 text-sm text-gray-700">{customer.name}</td>
+                    <td className="py-3 px-4 text-sm text-gray-700">{customer.email || 'Aniqlanmagan'}</td>
+                    <td className="py-3 px-4 text-sm text-gray-700">{customer.phone}</td>
+                    <td className="py-3 px-4 text-sm text-gray-700">{customer.orders || 0}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+          <p className="text-gray-500">Hozircha mijozlar yo'q</p>
+        </div>
+      )}
     </div>
   )
 }

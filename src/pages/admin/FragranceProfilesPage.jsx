@@ -65,45 +65,27 @@ function FragranceProfilesPage() {
           <h2 className="text-xl font-semibold text-[#111111] mb-4">Yangi profil qo'shish</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2 text-[#111111]">
-                Nomi <span className="text-red-500">*</span>
-              </label>
+              <label className="block text-sm font-medium mb-2 text-[#111111]">Nomi</label>
               <input
                 type="text"
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold"
-                placeholder="Masalan: Fresh & Clean"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2 text-[#111111]">
-                Tavsif
-              </label>
+              <label className="block text-sm font-medium mb-2 text-[#111111]">Tavsif</label>
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold"
                 rows="3"
-                placeholder="Profil tavsifi..."
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2 text-[#111111]">
-                Notalar
-              </label>
-              <textarea
-                value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold"
-                rows="3"
-                placeholder="Hid notalari..."
               />
             </div>
             <button
               type="submit"
-              className="w-full bg-[#111111] text-white px-4 py-2 rounded-lg hover:bg-gold transition-colors"
+              className="px-6 py-2 bg-[#111111] text-white rounded-lg hover:bg-gold transition-colors"
             >
               Qo'shish
             </button>
@@ -111,28 +93,20 @@ function FragranceProfilesPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {profiles.length > 0 ? (
-          profiles.map((profile) => (
-            <div key={profile.id} className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-              <h3 className="text-xl font-semibold text-[#111111] mb-2">{profile.name}</h3>
-              {profile.description && (
-                <p className="text-gray-700 mb-3">{profile.description}</p>
-              )}
-              {profile.notes && (
-                <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">Notalar:</p>
-                  <p className="text-sm text-gray-700">{profile.notes}</p>
-                </div>
-              )}
+      {profiles.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {profiles.map((profile) => (
+            <div key={profile.id} className="bg-white rounded-lg shadow-sm p-6">
+              <h3 className="text-lg font-semibold text-[#111111] mb-2">{profile.name}</h3>
+              <p className="text-gray-700 text-sm">{profile.description || 'Tavsif yo\'q'}</p>
             </div>
-          ))
-        ) : (
-          <div className="col-span-full bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
-            Profillar topilmadi
-          </div>
-        )}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+          <p className="text-gray-500">Hozircha profillar yo'q</p>
+        </div>
+      )}
     </div>
   )
 }
