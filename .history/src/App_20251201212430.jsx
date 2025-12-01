@@ -7,7 +7,6 @@ import AdminPanel from './pages/admin/AdminPanel.jsx'
 import CustomerPanel from './pages/customer/CustomerPanel.jsx'
 import GoogleLoginButtonWrapper from './components/GoogleLoginButtonWrapper.jsx'
 import probnik from './assets/image.png'
-import bottles from './assets/bottles.png'
 
 function LandingPage({ onNavigate, customer, onNavigateToSurvey, onNavigateToCustomerPanel, onCustomerLogin }) {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -456,15 +455,15 @@ function LandingPage({ onNavigate, customer, onNavigateToSurvey, onNavigateToCus
               
               </div>
             </div>
-            <div className="bg-cream p-8 rounded-lg shadow-lg text-center hover:shadow-xl transition-shadow duration-300">
-              <div className="w-full max-w-md h-[500px] bg-gold/20 rounded-lg mx-auto mb-4 flex items-stretch justify-stretch overflow-hidden p-0">
-                <img src={bottles} alt="HIDIM Parfum Butilkalari" className="w-full h-full object-cover" />
+            <div className="bg-cream p-8 rounded-lg shadow-lg text-center">
+              <div className="w-48 h-64 bg-gold/20 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                <img src={probnik} alt="HIDIM 10 ml PROBNIK" className="max-w-full max-h-full object-contain" />
               </div>
               <h3 className="text-xl font-bold text-[#111111] mb-2">HIDIM 10 ml PROBNIK</h3>
               <p className="text-gray-700 mb-4">Sizga mos hidni avval sinab ko'ring.</p>
               <button
                 onClick={() => scrollToSection('sample')}
-                className="bg-[#111111] text-white px-6 py-2.5 rounded-lg text-sm hover:bg-gold transition-all duration-300 font-medium shadow-md hover:shadow-lg flex items-center gap-2 group mx-auto"
+                className="bg-[#111111] text-white px-6 py-2.5 rounded-lg text-sm hover:bg-gold transition-all duration-300 font-medium shadow-md hover:shadow-lg flex items-center gap-2 group"
               >
                 <span>Batafsil</span>
                 <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -599,6 +598,7 @@ function LandingPage({ onNavigate, customer, onNavigateToSurvey, onNavigateToCus
                   {/* Sweet & Oriental - Perfume Bottle Icon */}
                   <svg className="w-14 h-14 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-3h6" />
                   </svg>
                 </div>
               </div>
@@ -612,6 +612,7 @@ function LandingPage({ onNavigate, customer, onNavigateToSurvey, onNavigateToCus
                 <div className="w-24 h-24 flex items-center justify-center bg-gradient-to-br from-blue-50 to-cyan-50 rounded-full">
                   {/* Ocean & Marine - Wave Icon */}
                   <svg className="w-14 h-14 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.5L7.5 9l4.5 4.5L16.5 9l4.5 4.5M3 17.5L7.5 13l4.5 4.5L16.5 13l4.5 4.5" />
                   </svg>
                 </div>

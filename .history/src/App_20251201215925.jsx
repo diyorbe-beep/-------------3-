@@ -457,20 +457,9 @@ function LandingPage({ onNavigate, customer, onNavigateToSurvey, onNavigateToCus
               </div>
             </div>
             <div className="bg-cream p-8 rounded-lg shadow-lg text-center hover:shadow-xl transition-shadow duration-300">
-              <div className="w-full max-w-md h-[500px] bg-gold/20 rounded-lg mx-auto mb-4 flex items-stretch justify-stretch overflow-hidden p-0">
-                <img src={bottles} alt="HIDIM Parfum Butilkalari" className="w-full h-full object-cover" />
+              <div className="w-full max-w-md h-[500px] bg-gold/20 rounded-lg mx-auto flex items-center justify-center overflow-hidden p-0">
+                <img src={bottles} alt="HIDIM Parfum Butilkalari" className="w-full h-full object-contain" />
               </div>
-              <h3 className="text-xl font-bold text-[#111111] mb-2">HIDIM 10 ml PROBNIK</h3>
-              <p className="text-gray-700 mb-4">Sizga mos hidni avval sinab ko'ring.</p>
-              <button
-                onClick={() => scrollToSection('sample')}
-                className="bg-[#111111] text-white px-6 py-2.5 rounded-lg text-sm hover:bg-gold transition-all duration-300 font-medium shadow-md hover:shadow-lg flex items-center gap-2 group mx-auto"
-              >
-                <span>Batafsil</span>
-                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
             </div>
           </div>
         </div>

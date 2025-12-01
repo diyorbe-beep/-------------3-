@@ -246,3 +246,4 @@ function CustomerPanel({ customer, onLogout }) {
 
 export default CustomerPanel
 
+

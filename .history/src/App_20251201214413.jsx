@@ -457,8 +457,8 @@ function LandingPage({ onNavigate, customer, onNavigateToSurvey, onNavigateToCus
               </div>
             </div>
             <div className="bg-cream p-8 rounded-lg shadow-lg text-center hover:shadow-xl transition-shadow duration-300">
-              <div className="w-full max-w-md h-[500px] bg-gold/20 rounded-lg mx-auto mb-4 flex items-stretch justify-stretch overflow-hidden p-0">
-                <img src={bottles} alt="HIDIM Parfum Butilkalari" className="w-full h-full object-cover" />
+              <div className="w-full max-w-xs h-80 bg-gradient-to-b from-gold/10 to-cream rounded-xl mx-auto mb-6 flex items-center justify-center overflow-hidden p-2 border border-gold/20">
+                <img src={bottles} alt="HIDIM Parfum Butilkalari" className="w-full h-full object-contain drop-shadow-lg" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
               </div>
               <h3 className="text-xl font-bold text-[#111111] mb-2">HIDIM 10 ml PROBNIK</h3>
               <p className="text-gray-700 mb-4">Sizga mos hidni avval sinab ko'ring.</p>

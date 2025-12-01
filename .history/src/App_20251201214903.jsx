@@ -457,7 +457,7 @@ function LandingPage({ onNavigate, customer, onNavigateToSurvey, onNavigateToCus
               </div>
             </div>
             <div className="bg-cream p-8 rounded-lg shadow-lg text-center hover:shadow-xl transition-shadow duration-300">
-              <div className="w-full max-w-md h-[500px] bg-gold/20 rounded-lg mx-auto mb-4 flex items-stretch justify-stretch overflow-hidden p-0">
+              <div className="w-48 h-64 bg-gold/20 rounded-lg mx-auto mb-4 flex items-center justify-center overflow-hidden p-0">
                 <img src={bottles} alt="HIDIM Parfum Butilkalari" className="w-full h-full object-cover" />
               </div>
               <h3 className="text-xl font-bold text-[#111111] mb-2">HIDIM 10 ml PROBNIK</h3>

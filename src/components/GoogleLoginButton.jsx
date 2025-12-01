@@ -1,6 +1,23 @@
 import { useGoogleLogin } from '@react-oauth/google'
+import { useState, useEffect } from 'react'
 
 function GoogleLoginButton({ onSuccess, onError }) {
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    // Mobil qurilmani aniqlash
+    const checkMobile = () => {
+      const userAgent = navigator.userAgent || navigator.vendor || window.opera
+      const isMobileDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase())
+      const isSmallScreen = window.innerWidth < 768
+      setIsMobile(isMobileDevice || isSmallScreen)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
   const login = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
@@ -22,20 +39,27 @@ function GoogleLoginButton({ onSuccess, onError }) {
           onSuccess({
             name: userInfo.name,
             email: userInfo.email,
-            picture: userInfo.picture
+            picture: userInfo.picture,
+            given_name: userInfo.given_name,
+            family_name: userInfo.family_name
           })
         }
       } catch (error) {
+        console.error('Google login error:', error)
         if (onError) {
           onError(error)
         }
       }
     },
     onError: (error) => {
+      console.error('Google login error:', error)
       if (onError) {
         onError(error)
       }
-    }
+    },
+    // Mobil qurilmalarda redirect, desktop'da popup
+    ux_mode: isMobile ? 'redirect' : 'popup',
+    redirect_uri: isMobile ? window.location.origin : undefined
   })
 
   return (

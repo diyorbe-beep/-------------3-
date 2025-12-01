@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+image.pngimport { useState, useEffect, useRef } from 'react'
 import { ordersAPI, customersAPI } from './services/api'
 import { PRICES, PRODUCTS, PRODUCT_MAP, PRICE_MAP } from './constants/prices'
 import './App.css'
@@ -7,7 +7,6 @@ import AdminPanel from './pages/admin/AdminPanel.jsx'
 import CustomerPanel from './pages/customer/CustomerPanel.jsx'
 import GoogleLoginButtonWrapper from './components/GoogleLoginButtonWrapper.jsx'
 import probnik from './assets/image.png'
-import bottles from './assets/bottles.png'
 
 function LandingPage({ onNavigate, customer, onNavigateToSurvey, onNavigateToCustomerPanel, onCustomerLogin }) {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -456,15 +455,15 @@ function LandingPage({ onNavigate, customer, onNavigateToSurvey, onNavigateToCus
               
               </div>
             </div>
-            <div className="bg-cream p-8 rounded-lg shadow-lg text-center hover:shadow-xl transition-shadow duration-300">
-              <div className="w-full max-w-md h-[500px] bg-gold/20 rounded-lg mx-auto mb-4 flex items-stretch justify-stretch overflow-hidden p-0">
-                <img src={bottles} alt="HIDIM Parfum Butilkalari" className="w-full h-full object-cover" />
+            <div className="bg-cream p-8 rounded-lg shadow-lg text-center">
+              <div className="w-48 h-64 bg-gold/20 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                <img src={probnik} alt="HIDIM 10 ml PROBNIK" className="max-w-full max-h-full object-contain" />
               </div>
               <h3 className="text-xl font-bold text-[#111111] mb-2">HIDIM 10 ml PROBNIK</h3>
               <p className="text-gray-700 mb-4">Sizga mos hidni avval sinab ko'ring.</p>
               <button
                 onClick={() => scrollToSection('sample')}
-                className="bg-[#111111] text-white px-6 py-2.5 rounded-lg text-sm hover:bg-gold transition-all duration-300 font-medium shadow-md hover:shadow-lg flex items-center gap-2 group mx-auto"
+                className="bg-[#111111] text-white px-6 py-2.5 rounded-lg text-sm hover:bg-gold transition-all duration-300 font-medium shadow-md hover:shadow-lg flex items-center gap-2 group"
               >
                 <span>Batafsil</span>
                 <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -579,12 +578,22 @@ function LandingPage({ onNavigate, customer, onNavigateToSurvey, onNavigateToCus
             HIDIM hid yo'nalishlari
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-cream p-6 rounded-lg shadow-sm text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border border-gold/20">
+            <div className="bg-cream p-6 rounded-lg shadow-sm text-center hover:shadow-md transition-all duration-300 hover:-translate-y-1">
               <div className="flex justify-center mb-4">
-                <div className="w-24 h-24 flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-50 rounded-full">
-                  {/* Fresh - Leaf Icon */}
-                  <svg className="w-14 h-14 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z" />
+                <div className="w-20 h-20 flex items-center justify-center">
+                  {/* Fresh - Leaf/Sprig Icon */}
+                  <svg className="w-full h-full text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                    {/* Left branch with leaves */}
+                    <path d="M8 4c-1.5 0-3 1-3 2.5 0 1.5 1.5 2.5 3 2.5.5 0 1-.1 1.5-.3-.5.8-.5 1.8 0 2.6.5.8 1.3 1.4 2.2 1.4.9 0 1.7-.6 2.2-1.4.5-.8.5-1.8 0-2.6.5.2 1 .3 1.5.3 1.5 0 3-1 3-2.5 0-1.5-1.5-2.5-3-2.5-1 0-1.8.5-2.3 1.2C9.8 4.5 9 4 8 4z"/>
+                    {/* Right branch with leaves */}
+                    <path d="M16 4c1.5 0 3 1 3 2.5 0 1.5-1.5 2.5-3 2.5-.5 0-1-.1-1.5-.3.5.8.5 1.8 0 2.6-.5.8-1.3 1.4-2.2 1.4-.9 0-1.7-.6-2.2-1.4-.5-.8-.5-1.8 0-2.6-.5.2-1 .3-1.5.3-1.5 0-3-1-3-2.5 0-1.5 1.5-2.5 3-2.5 1 0 1.8.5 2.3 1.2C14.2 4.5 15 4 16 4z"/>
+                    {/* Center stem */}
+                    <path d="M11.5 2v20h1V2h-1z"/>
+                    {/* Small decorative leaves */}
+                    <circle cx="6" cy="7" r="1.2" fill="currentColor" opacity="0.7"/>
+                    <circle cx="18" cy="7" r="1.2" fill="currentColor" opacity="0.7"/>
+                    <circle cx="7" cy="9" r="0.8" fill="currentColor" opacity="0.6"/>
+                    <circle cx="17" cy="9" r="0.8" fill="currentColor" opacity="0.6"/>
                   </svg>
                 </div>
               </div>
@@ -593,12 +602,24 @@ function LandingPage({ onNavigate, customer, onNavigateToSurvey, onNavigateToCus
                 Sauvage, Bleu de Chanel ruhidagi toza, yangicha, energiyali hidlar.
               </p>
             </div>
-            <div className="bg-cream p-6 rounded-lg shadow-sm text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border border-gold/20">
+            <div className="bg-cream p-6 rounded-lg shadow-sm text-center hover:shadow-md transition-all duration-300 hover:-translate-y-1">
               <div className="flex justify-center mb-4">
-                <div className="w-24 h-24 flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 rounded-full">
-                  {/* Sweet & Oriental - Perfume Bottle Icon */}
-                  <svg className="w-14 h-14 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+                <div className="w-20 h-20 flex items-center justify-center">
+                  {/* Sweet & Oriental - Honey Jar with Dripping */}
+                  <svg className="w-full h-full text-amber-600" fill="currentColor" viewBox="0 0 24 24">
+                    {/* Jar body */}
+                    <path d="M10 6c-1.5 0-2.5 1-2.5 2.5v9c0 1.5 1 2.5 2.5 2.5h5c1.5 0 2.5-1 2.5-2.5v-9c0-1.5-1-2.5-2.5-2.5h-5z" opacity="0.9"/>
+                    {/* Jar neck */}
+                    <rect x="10.5" y="4" width="3" height="2" rx="0.5" opacity="0.8"/>
+                    {/* Jar lid */}
+                    <rect x="9.5" y="2" width="5" height="1.5" rx="0.3" opacity="0.7"/>
+                    {/* Dripping honey from lid */}
+                    <path d="M11 3.5c0 1 0 2 0 3" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+                    <path d="M12 3.5c0 1 0 2 0 3" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+                    <path d="M13 3.5c0 1 0 2 0 3" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+                    {/* Honey drops */}
+                    <circle cx="11.5" cy="7" r="1" fill="currentColor" opacity="0.8"/>
+                    <circle cx="12.5" cy="8" r="0.8" fill="currentColor" opacity="0.7"/>
                   </svg>
                 </div>
               </div>
@@ -607,12 +628,24 @@ function LandingPage({ onNavigate, customer, onNavigateToSurvey, onNavigateToCus
                 Vanilla, amber, oud notalari bilan issiq, chiroyli hidi yo'nalishlari.
               </p>
             </div>
-            <div className="bg-cream p-6 rounded-lg shadow-sm text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border border-gold/20">
+            <div className="bg-cream p-6 rounded-lg shadow-sm text-center hover:shadow-md transition-all duration-300 hover:-translate-y-1">
               <div className="flex justify-center mb-4">
-                <div className="w-24 h-24 flex items-center justify-center bg-gradient-to-br from-blue-50 to-cyan-50 rounded-full">
+                <div className="w-20 h-20 flex items-center justify-center">
                   {/* Ocean & Marine - Wave Icon */}
-                  <svg className="w-14 h-14 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.5L7.5 9l4.5 4.5L16.5 9l4.5 4.5M3 17.5L7.5 13l4.5 4.5L16.5 13l4.5 4.5" />
+                  <svg className="w-full h-full text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    {/* Main wave curve */}
+                    <path d="M2 14c2 0 4-1.5 4-3.5S4 7 2 7s-4 1.5-4 3.5 2 3.5 4 3.5z" transform="translate(2 4)"/>
+                    <path d="M18 14c2 0 4-1.5 4-3.5S20 7 18 7s-4 1.5-4 3.5 2 3.5 4 3.5z" transform="translate(2 4)"/>
+                    {/* Secondary wave */}
+                    <path d="M6 16c1.5 0 3-1 3-2.5s-1.5-2.5-3-2.5-3 1-3 2.5 1.5 2.5 3 2.5z" transform="translate(2 2)"/>
+                    <path d="M14 16c1.5 0 3-1 3-2.5s-1.5-2.5-3-2.5-3 1-3 2.5 1.5 2.5 3 2.5z" transform="translate(2 2)"/>
+                    {/* Foam/splash bubbles at top */}
+                    <circle cx="6" cy="4" r="1.2" fill="white" opacity="0.9"/>
+                    <circle cx="10" cy="3" r="1" fill="white" opacity="0.8"/>
+                    <circle cx="14" cy="4" r="1.2" fill="white" opacity="0.9"/>
+                    <circle cx="18" cy="3" r="1" fill="white" opacity="0.8"/>
+                    <circle cx="8" cy="5" r="0.6" fill="white" opacity="0.7"/>
+                    <circle cx="16" cy="5" r="0.6" fill="white" opacity="0.7"/>
                   </svg>
                 </div>
               </div>
